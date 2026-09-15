@@ -1,25 +1,24 @@
-import mysql from 'mysql2/promise'; // I dont know specifically why using /promise but they do in the documentation i read
-import credentials from '../server-credentials.json';
+import { db } from "./database-config";
 
-async function startConnection() {
-    //REQUIRED doesnt convert directly, have to do funny business
-    let ssl_mode = undefined;
-    if(credentials.ssl_mode == 'REQUIRED') ssl_mode = { rejectUnauthorized: false };
+export let movieID:number;
+export let showingID:number;
 
-    const connectionPool = mysql.createPool({
-        host: credentials.host,
-        port: Number(credentials.port),
-        user: credentials.username,
-        password: credentials.password,
-        database: credentials.schema,
-        connectionLimit: 5,
-        ssl: ssl_mode
-    });
-
-    console.log('pool started');
-
-    const test = await connectionPool.execute('SHOW TABLES;');
-    console.log(test);
+export async function getShowingList(){
+    db;
 }
 
-startConnection();
+export async function getMovieInfo(){
+
+}
+
+export async function getShowingInfo(){
+
+}
+
+export async function createTicket(){
+
+}
+
+export async function deleteTicket(){
+
+}

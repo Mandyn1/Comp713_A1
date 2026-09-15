@@ -8,7 +8,7 @@ appDiv.innerHTML = `
 `;
 
 // Temp check connection works
-fetch('/api/movies')
+fetch('/api/showings')
   .then(response => response.json())
   .then(data => {
     const statusText = document.querySelector<HTMLParagraphElement>('#api-status')!;

@@ -1,4 +1,5 @@
 CREATE TABLE movies (
+    id BIGINT NOT NULL AUTO_INCREMENT,
     name VARCHAR(100) NOT NULL,
     genre VARCHAR(100) NOT NULL,
     director VARCHAR(100) NOT NULL,
@@ -16,9 +17,9 @@ CREATE TABLE seats (
 CREATE TABLE showings (
     id BIGINT NOT NULL AUTO_INCREMENT,
     showing_date DATE NOT NULL,
-    name VARCHAR(100) NOT NULL,
+    movie BIGINT NOT NULL,
     PRIMARY KEY (id),
-    FOREIGN KEY (name) REFERENCES movies(name)
+    FOREIGN KEY (movie) REFERENCES movies(id)
 );
 
 CREATE TABLE tickets (
