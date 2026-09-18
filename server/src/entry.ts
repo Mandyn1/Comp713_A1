@@ -1,4 +1,5 @@
 import express from 'express';
+import { getShowingList } from './database';
 
 export const api = express();
 const PORT = 5000;
@@ -11,8 +12,10 @@ api.listen(PORT, () => {
 });
 
 //General Movie List (Server rendered view)
-api.get('/api/showings', (req, res) => {
+api.get('/api/showings', async (req, res) => {
   res.json({ message: "Hello from the TypeScript Backend!" });
+
+  const data = await getShowingList();
 });
 
 //Info in specific movie (Server rendered view)
