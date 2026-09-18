@@ -13,7 +13,8 @@ function startConnection(): mysql.Pool {
         password: credentials.password,
         database: credentials.schema,
         connectionLimit: 5,
-        ssl: ssl_mode
+        ssl: ssl_mode,
+        multipleStatements:true
     });
 }
 

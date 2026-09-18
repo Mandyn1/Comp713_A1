@@ -24,7 +24,7 @@ CREATE TABLE showings (
 
 CREATE TABLE tickets (
     id BIGINT NOT NULL AUTO_INCREMENT,
-    showing DATE NOT NULL,
+    showing BIGINT NOT NULL,
     seat BIGINT NOT NULL,
     PRIMARY KEY (id),
     FOREIGN KEY (showing) REFERENCES showings(id),

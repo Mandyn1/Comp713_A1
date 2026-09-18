@@ -1,5 +1,4 @@
 import express from 'express';
-import { showingID, movieID } from './database';
 
 export const api = express();
 const PORT = 5000;
@@ -17,26 +16,36 @@ api.get('/api/showings', (req, res) => {
 });
 
 //Info in specific movie (Server rendered view)
-api.get('/api/movies/' + movieID, (req, res) => {
+api.get('/api/movies/:movieID', (req, res) => {
+  const movieID = req.params.movieID;
+
   res.json({ message: "Hello from the TypeScript Backend!" });
 });
 
 //Booking page for specific movie (Server rendered view)
-api.get('/api/showings/' + showingID, (req, res) => {
+api.get('/api/showings/:showingID', (req, res) => {
+  const showingID = req.params.showingID;
+
   res.json({ message: "Hello from the TypeScript Backend!" });
 });
 
 //Reserve seat and start release timer
-api.get('/api/showings/' + showingID + '/reserve', (req, res) => {
+api.get('/api/showings/:showingID/reserve', (req, res) => {
+  const showingID = req.params.showingID;
+
   res.json({ message: "Hello from the TypeScript Backend!" });
 });
 
 //Release seat and end release timer (if no other seats are reserved)
-api.get('/api/showings/' + showingID + '/release', (req, res) => {
+api.get('/api/showings/:showingID/release', (req, res) => {
+  const showingID = req.params.showingID;
+
   res.json({ message: "Hello from the TypeScript Backend!" });
 });
 
 //Confirm booking and end release timer
-api.get('/api/showings/' + showingID + '/confirm', (req, res) => {
+api.get('/api/showings/:showingID/confirm', (req, res) => {
+  const showingID = req.params.showingID;
+
   res.json({ message: "Hello from the TypeScript Backend!" });
 });
