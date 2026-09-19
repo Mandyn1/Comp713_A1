@@ -1,5 +1,6 @@
-import { RowDataPacket } from "mysql2";
+import { ResultSetHeader, RowDataPacket } from "mysql2";
 import { db } from "./database-config";
+import fs from 'node:fs/promises';
 
 interface ShowingList extends RowDataPacket{
     showingDate: Date,
@@ -14,38 +15,64 @@ interface MovieInfo extends RowDataPacket{
 
 interface ShowingInfo extends RowDataPacket{
     name:string,
-    showingDate: Date,
+    showingDate:string,
     seatID:Number,
     seatRow:string,
     seatNumber:Number
 }
 
 export async function getShowingList(){
-    const statement = await db.execute<ShowingList[]>("SELECT showings.showing_date as showingDate, movies.name as movie from showings INNER JOIN movies ON showings.movie = movies.id");
+    const statement = await db.execute<ShowingList[]>("SELECT DATE_FORMAT(showings.showing_date, '%d/%m/%Y') as showingDate, movies.movieName as movie from showings INNER JOIN movies ON showings.movie = movies.id");
 
     return statement[0];
 }
 
 export async function getMovieInfo(movieID:number){
-    const statement = await db.execute<MovieInfo[]>("SELECT name, genre, director FROM movies WHERE id = ?", [movieID]);
+    const statement = await db.execute<MovieInfo[]>("SELECT movieName, genre, director FROM movies WHERE id = ?", [movieID]);
     
     return statement[0];
 }
 
 export async function getShowingInfo(showingID:number){
-    const statement = await db.execute<ShowingInfo[]>("SELECT movies.name, showings.showing_date as showingDate, seats.id as seatID, seats.row as seatRow, seats.number as seatNumber FROM showing WHERE showing.id = ? INNER JOIN movies ON showings.movie = movies.id INNER JOIN tickets ON showings.id = tickets.showing INNER JOIN seats ON tickets.seat = seats.id", [showingID]);
+    const statement = await db.execute<ShowingInfo[]>("SELECT movies.movieName, DATE_FORMAT(showings.showing_date, '%d/%m/%Y') as showingDate, seats.id as seatID, seats.seatRow as seatRow, seats.seatNumber as seatNumber FROM showing WHERE showing.id = ? INNER JOIN movies ON showings.movie = movies.id INNER JOIN tickets ON showings.id = tickets.showing INNER JOIN seats ON tickets.seat = seats.id", [showingID]);
     
     return statement[0];
 }
 
 export async function createTicket(showingID:number, seatID:number){
-    const statement = await db.execute("INSERT INTO tickets (showing, seat) VALUES (?, ?)", [showingID, seatID]);
+    const statement = await db.execute<ResultSetHeader>("INSERT INTO tickets (showing, seat) VALUES (?, ?)", [showingID, seatID]);
 
-    return statement;
+    return statement[0];
 }
 
 export async function deleteTicket(ticketID:number){
-    const statement = await db.execute("DELETE FROM tickets WHERE id = ?", [ticketID]);
+    const statement = await db.execute<ResultSetHeader>("DELETE FROM tickets WHERE id = ?", [ticketID]);
 
-    return statement;
+    return statement[0];
+}
+
+export async function reloadDatabase():Promise<boolean>{
+    try {
+        const schema = await fs.readFile("schema.sql", 'utf-8');
+        const seed = await fs.readFile("seed.sql", 'utf-8');
+
+        await db.query(schema);
+        await db.query(seed);
+        
+        console.log('Database reloaded');
+        return true;
+    } catch (error) {
+        console.error('Database reload error', error);
+        return false;
+    }
+}
+
+export async function checkConnection():Promise<boolean>{
+    try{
+        await db.ping();
+        return true;
+    }
+    catch(err){
+        return false;
+    }
 }

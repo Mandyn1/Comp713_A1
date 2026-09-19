@@ -6,11 +6,13 @@ This project contains two seperate programs:
     Server - Backend
 
 This project has been written primarily in Typescript and uses Json to communicate via API between the two programs.  
-The concurrently library is used to speed up installation and remove the need to have multiple consoles open (im lazy)  
+The concurrently library is used to speed up installation and remove the need to have multiple consoles open.  
 The Webapp portion was started using a template provided by Vite.  
-The Server portion uses Express and Node.js.  
-After some exploration, the method for connecting to the supplied server is the mysql2 library  
+The Server portion uses Express, Node.js, and EJS.  
 There is a 'server-credentials.json' file excluded from github commits used to access this, request a copy of this if it is not supplied.  
+
+The project will load onto a page that checks access to the API and through that the Database. If successful, the page will wait 3 seconds then move the user to the Showings List page.  
+Outside of the starting API check page, all other pages are server rendered.  
 
 This project could be developed further by using cookies and storing the identity of the person who booked the seat rather than having a temporary 'held' state and a permenant 'booked' state
 

@@ -1,17 +1,22 @@
+DROP TABLE IF EXISTS tickets;
+DROP TABLE IF EXISTS showings;
+DROP TABLE IF EXISTS seats;
+DROP TABLE IF EXISTS movies;
+
 CREATE TABLE movies (
     id BIGINT NOT NULL AUTO_INCREMENT,
-    name VARCHAR(100) NOT NULL,
+    movieName VARCHAR(100) NOT NULL,
     genre VARCHAR(100) NOT NULL,
     director VARCHAR(100) NOT NULL,
-    PRIMARY KEY (name)
+    PRIMARY KEY (id)
 );
 
 CREATE TABLE seats (
     id BIGINT NOT NULL AUTO_INCREMENT,
-    row char(1) NOT NULL,
-    number INT NOT NULL,
-    PRIMARY KEY (id)
-    UNIQUE KEY unique_seat (row, number)
+    seatRow char(1) NOT NULL,
+    seatNumber INT NOT NULL,
+    PRIMARY KEY (id),
+    UNIQUE KEY unique_seat (seatRow, seatNumber)
 );
 
 CREATE TABLE showings (
@@ -28,6 +33,6 @@ CREATE TABLE tickets (
     seat BIGINT NOT NULL,
     PRIMARY KEY (id),
     FOREIGN KEY (showing) REFERENCES showings(id),
-    FOREIGN KEY (seat) REFERENCES seats(id)
+    FOREIGN KEY (seat) REFERENCES seats(id),
     UNIQUE KEY unique_ticket (seat, showing)
 );

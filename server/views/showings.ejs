@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Showings List</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<table>
+  <thead>
+    <tr>
+      <th>Movie Name</th>
+      <th>Date</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% if (data && data.length > 0) { %>
+      <% data.forEach((showing, index) => { %>
+        <tr>
+          <td><%= showing.movie %></td>
+          <td><%= showing.showingDate %></td>
+        </tr>
+      <% }); %>
+    <% } else { %>
+      <tr>
+        <td colspan="4" style="text-align: center;">No Showings Available</td>
+      </tr>
+    <% } %>
+  </tbody>
+</table>
+</html>
