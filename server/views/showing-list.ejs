@@ -8,16 +8,22 @@
 <table>
   <thead>
     <tr>
-      <th>Movie Name</th>
       <th>Date</th>
+      <th></th>
+      <th>Movie Name</th>
+      <th></th>
+      <th></th>
     </tr>
   </thead>
   <tbody>
     <% if (data && data.length > 0) { %>
       <% data.forEach((showing, index) => { %>
         <tr>
-          <td><%= showing.movie %></td>
           <td><%= showing.showingDate %></td>
+          <td>|</td>
+          <td><%= showing.movie %></td>
+          <td>|</td>
+          <td><button type="button" onclick="handleClick('<%= showing.id %>')">Book</button></td>
         </tr>
       <% }); %>
     <% } else { %>
@@ -28,3 +34,9 @@
   </tbody>
 </table>
 </html>
+
+<script>
+  function handleClick(id) {
+    window.location.href = "/api/showings/" + id;
+  }
+</script>

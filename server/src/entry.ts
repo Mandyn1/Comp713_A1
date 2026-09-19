@@ -1,5 +1,5 @@
-import express, { json } from 'express';
-import { checkConnection, getShowingList, reloadDatabase } from './database';
+import express from 'express';
+import { checkConnection, getSeatingInfo, getShowingInfo, getShowingList, getTicketInfo, reloadDatabase } from './database';
 
 export const api = express();
 const PORT = 5000;
@@ -18,24 +18,23 @@ api.use(express.static('public'));
 api.get('/api/showings', async (req, res) => {
   const data = await getShowingList();
 
-  //const jsonData = JSON.stringify(data);
-  //res.json({ message: jsonData });
-
-  await res.render('showings', { data: data });
+  await res.render('showing-list', { data: data });
 });
 
 //Info in specific movie (Server rendered view)
-api.get('/api/movies/:movieID', (req, res) => {
+api.get('/api/movies/:movieID', async (req, res) => {
   const movieID = Number(req.params.movieID);
-
-  res.json({ message: "Hello from the TypeScript Backend!" });
+  
 });
 
-//Booking page for specific movie (Server rendered view)
-api.get('/api/showings/:showingID', (req, res) => {
+//Booking page for specific showing (Server rendered view)
+api.get('/api/showings/:showingID', async (req, res) => {
   const showingID = Number(req.params.showingID);
+  const showingData = await getShowingInfo(showingID);
+  const seatingData = await getSeatingInfo(showingID);
+  const ticketData = await getTicketInfo(showingID);
 
-  res.json({ message: "Hello from the TypeScript Backend!" });
+  await res.render('showing', { showingData: showingData, seatingData: seatingData, ticketData: ticketData });
 });
 
 //Reserve seat and start release timer
