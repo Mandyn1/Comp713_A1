@@ -171,7 +171,7 @@ export function processTicketData(seatingData: SeatingInfo[], ticketData: Ticket
         }
         else seat.booked = false;
     });
-
+    console.log(seatingData);
     return formatSeatingData(seatingData);
 }
 
@@ -179,11 +179,12 @@ function formatSeatingData(seatingData:SeatingInfo[]):FormattedSeating{
     const rowCount = new Set(seatingData.map(seat => seat.seatRow)).size;
     const colCount = new Set(seatingData.map(seat => seat.seatNumber)).size;
 
-    let formattedSeats:FormattedSeating = {array: [[]], rowCount:rowCount, colCount:colCount};
+    let formattedSeats:FormattedSeating = {array: [], rowCount:rowCount, colCount:colCount};
 
-    for(let i = 0; i < seatingData.length; i + rowCount){
+    for(let i = 0; i * colCount < seatingData.length; i++){
+        formattedSeats.array[i] = [];
         for(let j = 0; j < colCount; j++){
-            formattedSeats.array[i][j] = seatingData[j + i];
+            formattedSeats.array[i][j] = seatingData[i * colCount + j];
         }
     }
     console.log(formattedSeats);
