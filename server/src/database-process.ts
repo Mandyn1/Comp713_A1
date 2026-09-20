@@ -1,7 +1,7 @@
 import { QueryResult, ResultSetHeader } from "mysql2";
 import { db } from "./database-config";
 import fs from 'node:fs/promises';
-import { ShowingList, showingListQuery, MovieInfo, movieInfoQuery, ShowingInfo, showingInfoQuery, SeatingInfo, seatingQuery, TicketInfo, ticketsQuery, createTicketQuery, deleteTicketQuery, tableExistsQuery, FormattedSeating, ticketTimerUpdateQuery, ticketTimerQuery, confirmTicketQuery, NewTicket } from "./database-definitions";
+import { ShowingList, showingListQuery, MovieInfo, movieInfoQuery, ShowingInfo, showingInfoQuery, SeatingInfo, seatingQuery, TicketInfo, ticketsQuery, createTicketQuery, deleteTicketQuery, tableExistsQuery, FormattedSeating, ticketTimerUpdateQuery, ticketTimerQuery, confirmTicketQuery } from "./database-definitions";
 
 export async function getShowingList():Promise<ShowingList[]>{
     const statement = await db.execute<ShowingList[]>(showingListQuery);
@@ -30,22 +30,21 @@ export async function getSeatingInfo():Promise<SeatingInfo[]>{
 export async function getTicketInfo(showingID:number):Promise<TicketInfo[] | undefined>{
 
     let statement;
-
-    if( await checkTableExists("tickets")) statement = await db.execute<TicketInfo[]>(ticketsQuery, [showingID]);
-    else return;
-
+    statement = await db.execute<TicketInfo[]>(ticketsQuery, [showingID]);
+    
     return statement[0];
 }
 
 export async function createTicket(showingID:number, seatID:number):Promise<Number>{
-    const statement = (await db.execute<NewTicket[]>(createTicketQuery, [showingID, seatID]))[0][0];
+    const newTicket = (await db.execute<ResultSetHeader>(createTicketQuery, [showingID, seatID]))[0].insertId;
 
     if(!timerRunning){
         timerRunning = true;
         timer();
+        console.log("Timer started!");
     }
 
-    return statement.id;
+    return newTicket;
 }
 
 export async function deleteTicket(ticketID:number):Promise<Boolean>{
@@ -108,7 +107,6 @@ export function processTicketData(seatingData: SeatingInfo[], ticketData: Ticket
 
                 if(found == true) return;
                 else if(ticket.seatID == seat.id ) {
-
                     seat.available = false;
                     found = true;
                 }
@@ -149,6 +147,7 @@ async function timer(){
     //Stop if tickets table doesnt exist / has been created but nothing inserted
     if(!(await checkTableExists('tickets'))) {
         timerRunning = false;
+        console.log("Timer Stopped!");
         return;
     }
 
@@ -158,6 +157,7 @@ async function timer(){
     const updateStats =  (await db.execute<ResultSetHeader>(ticketTimerUpdateQuery, timerInterval / 1000))[0];
     if(updateStats.affectedRows == 0) {
         timerRunning = false;
+        console.log("Timer Stopped!");
         return;
     }
 

@@ -14,55 +14,6 @@ api.listen(PORT, () => {
 api.set('view engine', 'ejs');
 api.use(express.static('public'));
 
-//General Movie List (Server rendered view)
-api.get('/api/showings', async (req, res) => {
-  const data = await getShowingList();
-
-  await res.render('showing-list', { data: data });
-});
-
-//Info in specific movie (Server rendered view)
-api.get('/api/movies/:movieID', async (req, res) => {
-  const movieID = Number(req.params.movieID);
-  
-});
-
-//Booking page for specific showing (Server rendered view)
-api.get('/api/showings/:showingID', async (req, res) => {
-  const showingID = Number(req.params.showingID);
-  const showingData = await getShowingInfo(showingID);
-  const seatingData = processTicketData(await getSeatingInfo(), await getTicketInfo(showingID));
-
-  await res.render('showing', { showingData: showingData, seatingData: seatingData });
-});
-
-//Reserve seat and start release timer
-api.get('/api/showings/:showingID/reserve=:seatID', async (req, res) => {
-  const showingID = Number(req.params.showingID);
-  const seatID = Number(req.params.seatID);
-
-  const newTicket = await createTicket(showingID, seatID);
-
-  res.json({ id: newTicket });
-});
-
-//Release seat and end release timer (if no other seats are reserved)
-api.get('/api/showings/release=:ticketID', (req, res) => {
-  const ticketID = Number(req.params.ticketID);
-
-  deleteTicket(ticketID);
-  res.json({ message: "Hello from the TypeScript Backend!" });
-});
-
-//Confirm booking and end release timer
-api.get('/api/showings/confirm=:ticketID', (req, res) => {
-  const ticketID = Number(req.params.ticketID);
-
-  confirmTicket(ticketID);
-
-  res.json({ message: "Hello from the TypeScript Backend!" });
-});
-
 //Drops database and reloads from schema.sql and seed.sql
 api.get('/api/datareload', async (req, res) => {
 
@@ -77,4 +28,53 @@ api.get('/api/response', async (req, res) => {
   else {
     res.status(200).json({ message: "Connected to Database" });
   }
+});
+
+//Reserve seat and start release timer
+api.get('/api/showings/:showingID/reserve=:seatID', async (req, res) => {
+  const showingID = Number(req.params.showingID);
+  const seatID = Number(req.params.seatID);
+
+  const newTicket = await createTicket(showingID, seatID);
+  res.status(201).send({ message: newTicket });
+});
+
+//Release seat and end release timer (if no other seats are reserved)
+api.get('/api/showings/release=:ticketID', (req, res) => {
+  const ticketID = Number(req.params.ticketID);
+
+  deleteTicket(ticketID);
+
+  res.sendStatus(204);
+});
+
+//Confirm booking and end release timer
+api.get('/api/showings/confirm=:ticketID', (req, res) => {
+  const ticketID = Number(req.params.ticketID);
+
+  confirmTicket(ticketID);
+
+  res.json({ message: "Hello from the TypeScript Backend!" });
+});
+
+//Info in specific movie (Server rendered view)
+api.get('/api/movies/:movieID', async (req, res) => {
+  const movieID = Number(req.params.movieID);
+  
+});
+
+//Booking page for specific showing (Server rendered view)
+api.get('/api/showings/:showingID', async (req, res) => {
+  const showingID = Number(req.params.showingID);
+  const showingData = await getShowingInfo(showingID);
+  const seatingData = processTicketData(await getSeatingInfo(), await getTicketInfo(showingID));
+
+  res.render('showing', { showingData: showingData, seatingData: seatingData });
+});
+
+//General Movie List (Server rendered view)
+api.get('/api/showings', async (req, res) => {
+  const data = await getShowingList();
+
+  await res.render('showing-list', { data: data });
 });

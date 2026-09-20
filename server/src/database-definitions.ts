@@ -13,6 +13,7 @@ export interface MovieInfo extends RowDataPacket{
 }
 
 export interface ShowingInfo extends RowDataPacket{
+    id:number,
     name:string,
     showingDate:string
 }
@@ -37,11 +38,6 @@ export interface FormattedSeating{
     colCount:Number
 }
 
-export interface NewTicket extends RowDataPacket{
-    id:Number
-}
-
-
 export const showingListQuery:string = "SELECT showings.id, DATE_FORMAT(showings.showing_date, '%d/%m/%Y') as showingDate, movies.movieName as movie "+
                                 "from showings " +
                                 "INNER JOIN movies ON showings.movie = movies.id " +
@@ -50,7 +46,7 @@ export const showingListQuery:string = "SELECT showings.id, DATE_FORMAT(showings
 export const movieInfoQuery:string = "SELECT movieName, genre, director FROM movies " +
                                 "WHERE id = ?";
 
-export const showingInfoQuery:string = "SELECT movies.movieName as name, DATE_FORMAT(showings.showing_date, '%d/%m/%Y') as showingDate " + 
+export const showingInfoQuery:string = "SELECT showings.id as id, movies.movieName as name, DATE_FORMAT(showings.showing_date, '%d/%m/%Y') as showingDate " + 
                                 "FROM showings " +
                                 "INNER JOIN movies ON showings.movie = movies.id " +
                                 "WHERE showings.id = ?";
@@ -60,12 +56,11 @@ export const seatingQuery:string = "SELECT seats.id as id, seats.seatRow as seat
 
 export const ticketsQuery:string = "SELECT tickets.id as ticketID, tickets.seat as seatID, tickets.confirmed as confirmed " + 
                             "FROM tickets " +
-                            "INNER JOIN tickets ON showings.id = tickets.showing " +
+                            "INNER JOIN showings ON showings.id = tickets.showing " +
                             "WHERE tickets.showing = ?";
 
 export const createTicketQuery:string = "INSERT INTO tickets (showing, seat, confirmed, timer) " +
-                                "VALUES (?, ?, FALSE, 120); " +
-                                "SELECT LAST_INSERT_ID() as id;";
+                                "VALUES (?, ?, FALSE, 120)";
 
 export const deleteTicketQuery:string = "DELETE FROM tickets " +
                                 "WHERE id = ?";

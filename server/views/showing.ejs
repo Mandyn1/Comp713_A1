@@ -27,7 +27,11 @@
                     <th><%= seatingData.array[i][0].seatRow %></th>
 
                     <% for(let j = 0; j < seatingData.colCount; j++) { %>
-                        <td><button type="button" onclick="handleSeatClick('<%= showingData.movie %>', '<%= seatingData.array[i][j] %>')">Book</button></td>
+                        <% if(seatingData.array[i][j].available == true) { %>
+                            <td><button type="button" onclick="handleSeatClick('<%= showingData.id %>', '<%= seatingData.array[i][j].id %>', '<%= seatingData.array[i][j].available %>')">Book</button></td>
+                        <% }  else { %>
+                            <td><button type="button" onclick="">Taken</button></td>
+                        <% }; %>
                     <% }; %>
                 </tr>
             <% }; %>
@@ -38,30 +42,26 @@
         </tr>
     <% } %>
 </table>
+<div id="timerBox" style="display: none;">
+    Reserve Timer: <span id="timerText">00</span>
+</div>
 </html>
 
 <script>
-
-    function delay (time){
-        return new Promise((resolve) => setTimeout(resolve, time));
-    };
-
-    let timerStarted = false;
-    let currentTime = 60;
 
     function handleMovieClick(movieID) {
         window.location.href = "/api/movies/" + movieID;
     }
 
-    function handleSeatClick(showingID, seat){
-        if(seat.available){
-            fetch('/api/showings/' + showingID + '/reserve=' + seat.id)
-            .then((response) => {
-                response.json()
-                .then(data => {
-                    addReservedList(data.id);
-                });
-            });
+    async function handleSeatClick(showingID, seatID, seatAvailable){
+        if(seatAvailable){
+            const response = await fetch("/api/showings/" + showingID + "/reserve=" + seatID);
+            const data = await response.json();
+
+            addReservedList(data.message);
+            if(!timerRunning) timer();
+            
+            alert("Seat Reserved!");
         }
         else alert("Seat is unavailable!");
     }
@@ -101,13 +101,49 @@
         sessionStorage.setItem('reservedTickets', JSON.stringify(list));
     }
 
-    function clearReservedList(){
+    async function clearReservedList(){
         const list = getReservedList();
 
-        list.forEach(async element => {
+        for (const element of list){
             await fetch('/api/showings/release=' + element);
-        });
+        };
 
         sessionStorage.removeItem('reservedTickets');
     }
+
+    let timerRunning = false;
+    let timerInterval = 1000; // ms
+    let timerRemaining = 60;
+
+    function delay (time) {
+    return new Promise((resolve) => setTimeout(resolve, time));
+    };
+
+    //Recursive timer that runs if non-confirmed tickets exist
+    async function timer(){
+
+        timerRemaining = 60;
+        timerRunning = true;
+        
+        const timerBox = document.getElementById('timerBox');
+        const timerText = document.getElementById('timerText');
+        
+        // Show the container
+        timerBox.style.display = 'block'; 
+
+        while(timerRunning){
+            await delay(timerInterval);
+            timerRemaining--;
+            // Inject your countdown text
+            timerText.textContent = timerRemaining; 
+
+            if(timerRemaining <= 0){
+                await clearReservedList();
+                timerRunning = false;
+                timerBox.style.display = 'none'; 
+                alert("Reserve Time Expired, Please Reselect Tickets");
+            }
+        }
+    }
+
 </script>
