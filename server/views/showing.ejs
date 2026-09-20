@@ -9,4 +9,32 @@
     <h1><%= showingData.name %></h1>
     <h2><%= showingData.showingDate %></h2>
 </body>
+<table>
+    <% if (seatingData && seatingData.array.length > 0) { %>
+        <thead>
+            <tr>
+                <th></th>
+                <% for(let i = 1; i <= seatingData.colCount; i++) { %>
+                    <th><%= i %></th>
+                <% }; %>
+            
+            </tr>
+        </thead>
+        <tbody>
+            <% for(let i = 0; i < seatingData.rowCount; i++) { %>
+                <tr>
+                    <th><%= seatingData.array[i][0].seatRow %></th>
+
+                    <% for(let j = 0; j < seatingData.colCount; j++) { %>
+                        <td><%= seatingData.array[i][j].id %></td>
+                    <% }; %>
+                </tr>
+            <% }; %>
+        </tbody>
+    <% } else { %>
+        <tr>
+            <td colspan="4" style="text-align: center;">Unable to load Seating Grid</td>
+        </tr>
+    <% } %>
+</table>
 </html>

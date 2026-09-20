@@ -22,12 +22,19 @@ interface ShowingInfo extends RowDataPacket{
 interface SeatingInfo extends RowDataPacket{
     id:number,
     seatRow:string,
-    seatNumber:number
+    seatNumber:number,
+    booked:boolean
 }
 
 interface TicketInfo extends RowDataPacket{
     ticketID:number,
     seatID:number
+}
+
+interface FormattedSeating{
+    array:SeatingInfo[][],
+    rowCount:Number,
+    colCount:Number
 }
 
 
@@ -63,31 +70,31 @@ const tableExistsQuery:string = "SELECT COUNT(*) as count " +
                                     "WHERE table_schema = DATABASE() " +
                                     "AND table_name = '?'"
 
-export async function getShowingList(){
+export async function getShowingList():Promise<ShowingList[]>{
     const statement = await db.execute<ShowingList[]>(showingListQuery);
 
     return statement[0];
 }
 
-export async function getMovieInfo(movieID:number){
+export async function getMovieInfo(movieID:number):Promise<MovieInfo>{
     const statement = await db.execute<MovieInfo[]>(movieInfoQuery, [movieID]);
     
-    return statement[0];
+    return statement[0][0];
 }
 
-export async function getShowingInfo(showingID:number){
+export async function getShowingInfo(showingID:number):Promise<ShowingInfo>{
     const statement = await db.execute<ShowingInfo[]>(showingInfoQuery, [showingID]);
     
     return statement[0][0];
 }
 
-export async function getSeatingInfo(showingID:number){
-    const statement = await db.execute<SeatingInfo[]>(seatingQuery, [showingID]);
+export async function getSeatingInfo():Promise<SeatingInfo[]>{
+    const statement = await db.execute<SeatingInfo[]>(seatingQuery);
 
     return statement[0];
 }
 
-export async function getTicketInfo(showingID:number){
+export async function getTicketInfo(showingID:number):Promise<TicketInfo[] | undefined>{
 
     let statement;
 
@@ -140,4 +147,45 @@ export async function checkTableExists(tableName:string):Promise<boolean>{
 
     if(check.length > 0 && check[0].count > 0) return true;
     else return false;
+}
+
+export function processTicketData(seatingData: SeatingInfo[], ticketData: TicketInfo[] | undefined):FormattedSeating{ 
+    
+    let found:boolean;
+
+    seatingData.forEach(seat => {
+        found = false;
+
+        if(ticketData !== undefined) {
+
+            ticketData.forEach(ticket => {
+
+                if(found == true) return;
+                else if(ticket.seatID == seat.id ) {
+
+                    seat.booked = true;
+                    found = true;
+                }
+            });
+            if(found == false) seat.booked = false;
+        }
+        else seat.booked = false;
+    });
+
+    return formatSeatingData(seatingData);
+}
+
+function formatSeatingData(seatingData:SeatingInfo[]):FormattedSeating{
+    const rowCount = new Set(seatingData.map(seat => seat.seatRow)).size;
+    const colCount = new Set(seatingData.map(seat => seat.seatNumber)).size;
+
+    let formattedSeats:FormattedSeating = {array: [[]], rowCount:rowCount, colCount:colCount};
+
+    for(let i = 0; i < seatingData.length; i + rowCount){
+        for(let j = 0; j < colCount; j++){
+            formattedSeats.array[i][j] = seatingData[j + i];
+        }
+    }
+    console.log(formattedSeats);
+    return formattedSeats;
 }

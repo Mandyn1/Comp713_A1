@@ -1,5 +1,5 @@
 import express from 'express';
-import { checkConnection, getSeatingInfo, getShowingInfo, getShowingList, getTicketInfo, reloadDatabase } from './database';
+import { checkConnection, getSeatingInfo, getShowingInfo, getShowingList, getTicketInfo, processTicketData, reloadDatabase } from './database';
 
 export const api = express();
 const PORT = 5000;
@@ -31,17 +31,15 @@ api.get('/api/movies/:movieID', async (req, res) => {
 api.get('/api/showings/:showingID', async (req, res) => {
   const showingID = Number(req.params.showingID);
   const showingData = await getShowingInfo(showingID);
-  const seatingData = await getSeatingInfo(showingID);
-  const ticketData = await getTicketInfo(showingID);
+  const seatingData = processTicketData(await getSeatingInfo(), await getTicketInfo(showingID));
 
-  await res.render('showing', { showingData: showingData, seatingData: seatingData, ticketData: ticketData });
+  await res.render('showing', { showingData: showingData, seatingData: seatingData });
 });
 
 //Reserve seat and start release timer
-api.get('/api/showings/:showingID/reserve=:seatRow-:seatNumber', (req, res) => {
+api.get('/api/showings/:showingID/reserve=:seatID', (req, res) => {
   const showingID = Number(req.params.showingID);
-  const seatRow = req.params.seatRow;
-  const seatNumber = Number(req.params.seatNumber);
+  const seatID = req.params.seatID;
 
   res.json({ message: "Hello from the TypeScript Backend!" });
 });
