@@ -1,5 +1,5 @@
 import express from 'express';
-import { checkConnection, getSeatingInfo, getShowingInfo, getShowingList, getTicketInfo, processTicketData, reloadDatabase } from './database';
+import { checkConnection, confirmTicket, createTicket, deleteTicket, getSeatingInfo, getShowingInfo, getShowingList, getTicketInfo, processTicketData, reloadDatabase } from './database-process';
 
 export const api = express();
 const PORT = 5000;
@@ -37,24 +37,28 @@ api.get('/api/showings/:showingID', async (req, res) => {
 });
 
 //Reserve seat and start release timer
-api.get('/api/showings/:showingID/reserve=:seatID', (req, res) => {
-  const showingID = Number(req.params.showingID);
-  const seatID = req.params.seatID;
-
-  res.json({ message: "Hello from the TypeScript Backend!" });
-});
-
-//Release seat and end release timer (if no other seats are reserved)
-api.get('/api/showings/:showingID/release=:seatID', (req, res) => {
+api.get('/api/showings/:showingID/reserve=:seatID', async (req, res) => {
   const showingID = Number(req.params.showingID);
   const seatID = Number(req.params.seatID);
 
+  const newTicket = await createTicket(showingID, seatID);
+
+  res.json({ id: newTicket });
+});
+
+//Release seat and end release timer (if no other seats are reserved)
+api.get('/api/showings/release=:ticketID', (req, res) => {
+  const ticketID = Number(req.params.ticketID);
+
+  deleteTicket(ticketID);
   res.json({ message: "Hello from the TypeScript Backend!" });
 });
 
 //Confirm booking and end release timer
-api.get('/api/showings/:showingID/confirm', (req, res) => {
-  const showingID = Number(req.params.showingID);
+api.get('/api/showings/confirm=:ticketID', (req, res) => {
+  const ticketID = Number(req.params.ticketID);
+
+  confirmTicket(ticketID);
 
   res.json({ message: "Hello from the TypeScript Backend!" });
 });

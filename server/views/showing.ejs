@@ -6,8 +6,9 @@
     <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
-    <h1><%= showingData.name %></h1>
+    <h1><%= showingData.name %> || <button type="button" onclick="handleMovieClick('<%= showingData.movie %>')">Movie Info</button></h1>
     <h2><%= showingData.showingDate %></h2>
+
 </body>
 <table>
     <% if (seatingData && seatingData.array.length > 0) { %>
@@ -26,7 +27,7 @@
                     <th><%= seatingData.array[i][0].seatRow %></th>
 
                     <% for(let j = 0; j < seatingData.colCount; j++) { %>
-                        <td><%= seatingData.array[i][j].id %></td>
+                        <td><button type="button" onclick="handleSeatClick('<%= showingData.movie %>', '<%= seatingData.array[i][j] %>')">Book</button></td>
                     <% }; %>
                 </tr>
             <% }; %>
@@ -38,3 +39,75 @@
     <% } %>
 </table>
 </html>
+
+<script>
+
+    function delay (time){
+        return new Promise((resolve) => setTimeout(resolve, time));
+    };
+
+    let timerStarted = false;
+    let currentTime = 60;
+
+    function handleMovieClick(movieID) {
+        window.location.href = "/api/movies/" + movieID;
+    }
+
+    function handleSeatClick(showingID, seat){
+        if(seat.available){
+            fetch('/api/showings/' + showingID + '/reserve=' + seat.id)
+            .then((response) => {
+                response.json()
+                .then(data => {
+                    addReservedList(data.id);
+                });
+            });
+        }
+        else alert("Seat is unavailable!");
+    }
+
+    async function handleConfirmClick(){
+
+        const list = getReservedList();
+        let counter = list.length;
+
+        list.forEach(async element => {
+            if(await fetch('/api/showings/confirm=' + element)) counter--;
+
+        });
+
+        if(counter == 0){
+            alert("Tickets Confirmed: " + list.join(', '));
+        }
+        else{
+            alert("An Error has occured. Please reselect tickets!");
+        }
+
+        clearReservedList();
+    }
+
+    function getReservedList(){
+        const data = sessionStorage.getItem('reservedTickets');
+        const list = data ? JSON.parse(data) : []
+
+        return list;
+    }
+
+    function addReservedList(ticketID){
+        let list = getReservedList();
+
+        list.push(ticketID);
+
+        sessionStorage.setItem('reservedTickets', JSON.stringify(list));
+    }
+
+    function clearReservedList(){
+        const list = getReservedList();
+
+        list.forEach(async element => {
+            await fetch('/api/showings/release=' + element);
+        });
+
+        sessionStorage.removeItem('reservedTickets');
+    }
+</script>

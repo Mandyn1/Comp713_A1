@@ -33,10 +33,22 @@
     <% } %>
   </tbody>
 </table>
+<button type="button" onclick="handleResetClick()">Reset Database</button>
 </html>
 
 <script>
   function handleClick(id) {
     window.location.href = "/api/showings/" + id;
+  }
+
+  function handleResetClick() {
+    fetch('/api/datareload')
+    .then((response) =>{
+      response.json()
+      .then(data => {
+        alert(data.message);
+        window.location.href = '/api/showings';
+      });
+    });
   }
 </script>
