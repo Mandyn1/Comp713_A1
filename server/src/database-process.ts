@@ -44,7 +44,9 @@ export async function createTicket(showingID:number, seatID:number):Promise<Numb
 export async function deleteTicket(ticketID:number):Promise<Boolean>{
     const statement = (await db.execute<ResultSetHeader>(deleteTicketQuery, [ticketID]))[0];
 
-    if(statement.affectedRows !== 0) return true;
+    if(statement.affectedRows !== 0) {
+        return true;
+    }
     else return false;
 }
 

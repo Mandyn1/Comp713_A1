@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
-    <h1><%= showingData.name %> || <button type="button" onclick="handleMovieClick('<%= showingData.movie %>')">Movie Info</button></h1>
+    <h1><%= showingData.name %> || <button type="button" onclick="handleMovieClick()">Movie Info</button></h1>
     <h2><%= showingData.showingDate %></h2>
 
 </body>
@@ -25,16 +25,11 @@
             <% for(let i = 0; i < seatingData.rowCount; i++) { %>
                 <tr>
                     <th><%= seatingData.array[i][0].seatRow %></th>
-                    <% const temp = sessionStorage.getItem('reservedTickets'); %>
-                    <% const tempList = temp ? JSON.parse(temp) : []; %>
                     <% for(let j = 0; j < seatingData.colCount; j++) { %>
-                        <% if(tempList.includes(seatingData.array[i][j].id)) { %>
-                            <td><button type="button" onclick="handleSeatUnreserveClick('<%= showingData.id %>', '<%= seatingData.array[i][j].id %>', '<%= seatingData.array[i][j].available %>')">Unreserve</button></td>
-                        <% } else if(seatingData.array[i][j].available == true) { %>
-                            <td><button type="button" onclick="handleSeatReserveClick('<%= showingData.id %>', '<%= seatingData.array[i][j].id %>')">Reserve</button></td>
-                        <% }  else { %>
-                            <td><button type="button" onclick="">Taken</button></td>
-                        <% }; %>
+                        <td><button class="reserveButton" 
+                            seatID="<%= seatingData.array[i][j].id %>"
+                            available="<%= seatingData.array[i][j].available %>"
+                            >Taken</button></td>
                     <% }; %>
                 </tr>
             <% }; %>
@@ -46,51 +41,54 @@
     <% } %>
 </table>
 <div id="timerBox" style="display: none;">
-    Update Timer: <span id="timerText">00</span>
+    Update Timer: <span id="timerText">10</span>
 </div>
 </html>
 
 <script>
+    const showingID = "<%= showingData.id %>";
+    const movieID = '<%= showingData.movie %>';
 
-    function handleMovieClick(movieID) {
+
+    const buttonList = document.querySelectorAll('.reserveButton');
+
+    buttonList.forEach(button => {
+        const seatID = button.getAttribute('seatID');
+        const available = button.getAttribute('available');
+
+        if(available == 'true'){
+            button.textContent = "Reserve";
+            button.onclick = () => handleSeatReserveClick(seatID);
+        }
+        else if (sessionStorage.getItem(seatID) !== null){
+            button.textContent = "Unreserve";
+            button.onclick = () => handleSeatUnreserveClick(seatID);
+        }
+    });
+
+    function handleMovieClick() {
         window.location.href = "/api/movies/" + movieID;
     }
 
-    async function handleSeatReserveClick(showingID, seatID){
+    async function handleSeatReserveClick(seatID){
 
         const response = await fetch("/api/showings/" + showingID + "/reserve=" + seatID);
         const data = await response.json();
 
-        addReservedList(data.message);
+        sessionStorage.setItem(seatID,data.message);
         
         alert("Seat Reserved!");
 
-        fetch('/api/showings/' + showingID);
+        location.reload();
     }
 
-    async function handleSeatUnreserveClick(showingID, ticketID){
-        if(getReservedList().includes(ticketID)){
-            await fetch('/api/showings/release=' + ticketID);
+    async function handleSeatUnreserveClick(seatID){
+        await fetch('/api/showings/release=' + sessionStorage.getItem(seatID));
+        sessionStorage.removeItem(seatID);
 
-            alert("Seat Unreserved!");
+        alert("Seat Unreserved!");
 
-            fetch('/api/showings/' + showingID);
-        }
-    }
-
-    function getReservedList(){
-        const data = sessionStorage.getItem('reservedTickets');
-        const list = data ? JSON.parse(data) : []
-
-        return list;
-    }
-
-    function addReservedList(ticketID){
-        let list = getReservedList();
-
-        list.push(ticketID);
-
-        sessionStorage.setItem('reservedTickets', JSON.stringify(list));
+        location.reload();
     }
 
     let timerInterval = 1000; // ms
@@ -101,7 +99,7 @@
     };
 
     //Timer to reload page and check for external ticketing updates
-    async function timer(showingID){
+    async function timer(){
         
         timerBox.style.display = 'block'; 
 
@@ -111,9 +109,12 @@
             timerText.textContent = timerRemaining; 
 
             if(timerRemaining <= 0){
-                fetch('/api/showings/' + showingID);
+                location.reload();
+                return;
             }
         } 
     }
+
+    timer();
 
 </script>

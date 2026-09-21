@@ -40,10 +40,9 @@ api.get('/api/showings/:showingID/reserve=:seatID', async (req, res) => {
 });
 
 //Release seat and end release timer (if no other seats are reserved)
-api.get('/api/showings/release=:ticketID', (req, res) => {
+api.get('/api/showings/release=:ticketID', async (req, res) => {
   const ticketID = Number(req.params.ticketID);
-
-  deleteTicket(ticketID);
+  await deleteTicket(ticketID);
 
   res.sendStatus(204);
 });
