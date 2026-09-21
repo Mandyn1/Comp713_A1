@@ -25,10 +25,13 @@
             <% for(let i = 0; i < seatingData.rowCount; i++) { %>
                 <tr>
                     <th><%= seatingData.array[i][0].seatRow %></th>
-
+                    <% const temp = sessionStorage.getItem('reservedTickets'); %>
+                    <% const tempList = temp ? JSON.parse(temp) : []; %>
                     <% for(let j = 0; j < seatingData.colCount; j++) { %>
-                        <% if(seatingData.array[i][j].available == true) { %>
-                            <td><button type="button" onclick="handleSeatClick('<%= showingData.id %>', '<%= seatingData.array[i][j].id %>', '<%= seatingData.array[i][j].available %>')">Book</button></td>
+                        <% if(tempList.includes(seatingData.array[i][j].id)) { %>
+                            <td><button type="button" onclick="handleSeatUnreserveClick('<%= showingData.id %>', '<%= seatingData.array[i][j].id %>', '<%= seatingData.array[i][j].available %>')">Unreserve</button></td>
+                        <% } else if(seatingData.array[i][j].available == true) { %>
+                            <td><button type="button" onclick="handleSeatReserveClick('<%= showingData.id %>', '<%= seatingData.array[i][j].id %>')">Reserve</button></td>
                         <% }  else { %>
                             <td><button type="button" onclick="">Taken</button></td>
                         <% }; %>
@@ -43,7 +46,7 @@
     <% } %>
 </table>
 <div id="timerBox" style="display: none;">
-    Reserve Timer: <span id="timerText">00</span>
+    Update Timer: <span id="timerText">00</span>
 </div>
 </html>
 
@@ -53,37 +56,26 @@
         window.location.href = "/api/movies/" + movieID;
     }
 
-    async function handleSeatClick(showingID, seatID, seatAvailable){
-        if(seatAvailable){
-            const response = await fetch("/api/showings/" + showingID + "/reserve=" + seatID);
-            const data = await response.json();
+    async function handleSeatReserveClick(showingID, seatID){
 
-            addReservedList(data.message);
-            if(!timerRunning) timer();
-            
-            alert("Seat Reserved!");
-        }
-        else alert("Seat is unavailable!");
+        const response = await fetch("/api/showings/" + showingID + "/reserve=" + seatID);
+        const data = await response.json();
+
+        addReservedList(data.message);
+        
+        alert("Seat Reserved!");
+
+        fetch('/api/showings/' + showingID);
     }
 
-    async function handleConfirmClick(){
+    async function handleSeatUnreserveClick(showingID, ticketID){
+        if(getReservedList().includes(ticketID)){
+            await fetch('/api/showings/release=' + ticketID);
 
-        const list = getReservedList();
-        let counter = list.length;
+            alert("Seat Unreserved!");
 
-        list.forEach(async element => {
-            if(await fetch('/api/showings/confirm=' + element)) counter--;
-
-        });
-
-        if(counter == 0){
-            alert("Tickets Confirmed: " + list.join(', '));
+            fetch('/api/showings/' + showingID);
         }
-        else{
-            alert("An Error has occured. Please reselect tickets!");
-        }
-
-        clearReservedList();
     }
 
     function getReservedList(){
@@ -101,49 +93,27 @@
         sessionStorage.setItem('reservedTickets', JSON.stringify(list));
     }
 
-    async function clearReservedList(){
-        const list = getReservedList();
-
-        for (const element of list){
-            await fetch('/api/showings/release=' + element);
-        };
-
-        sessionStorage.removeItem('reservedTickets');
-    }
-
-    let timerRunning = false;
     let timerInterval = 1000; // ms
-    let timerRemaining = 60;
+    let timerRemaining = 10;
 
     function delay (time) {
     return new Promise((resolve) => setTimeout(resolve, time));
     };
 
-    //Recursive timer that runs if non-confirmed tickets exist
-    async function timer(){
-
-        timerRemaining = 60;
-        timerRunning = true;
+    //Timer to reload page and check for external ticketing updates
+    async function timer(showingID){
         
-        const timerBox = document.getElementById('timerBox');
-        const timerText = document.getElementById('timerText');
-        
-        // Show the container
         timerBox.style.display = 'block'; 
 
-        while(timerRunning){
+        while (true){
             await delay(timerInterval);
             timerRemaining--;
-            // Inject your countdown text
             timerText.textContent = timerRemaining; 
 
             if(timerRemaining <= 0){
-                await clearReservedList();
-                timerRunning = false;
-                timerBox.style.display = 'none'; 
-                alert("Reserve Time Expired, Please Reselect Tickets");
+                fetch('/api/showings/' + showingID);
             }
-        }
+        } 
     }
 
 </script>

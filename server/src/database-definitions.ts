@@ -28,8 +28,6 @@ export interface SeatingInfo extends RowDataPacket{
 export interface TicketInfo extends RowDataPacket{
     ticketID:number,
     seatID:number,
-    confirmed:boolean,
-    timer:number
 }
 
 export interface FormattedSeating{
@@ -54,13 +52,13 @@ export const showingInfoQuery:string = "SELECT showings.id as id, movies.movieNa
 export const seatingQuery:string = "SELECT seats.id as id, seats.seatRow as seatRow, seats.seatNumber as seatNumber " + 
                             "FROM seats";
 
-export const ticketsQuery:string = "SELECT tickets.id as ticketID, tickets.seat as seatID, tickets.confirmed as confirmed " + 
+export const ticketsQuery:string = "SELECT tickets.id as ticketID, tickets.seat as seatID " + 
                             "FROM tickets " +
                             "INNER JOIN showings ON showings.id = tickets.showing " +
                             "WHERE tickets.showing = ?";
 
-export const createTicketQuery:string = "INSERT INTO tickets (showing, seat, confirmed, timer) " +
-                                "VALUES (?, ?, FALSE, 120)";
+export const createTicketQuery:string = "INSERT INTO tickets (showing, seat) " +
+                                "VALUES (?, ?)";
 
 export const deleteTicketQuery:string = "DELETE FROM tickets " +
                                 "WHERE id = ?";
@@ -69,15 +67,3 @@ export const tableExistsQuery:string = "SELECT COUNT(*) as count " +
                                     "FROM information_schema.tables " +
                                     "WHERE table_schema = DATABASE() " +
                                     "AND table_name = '?'"
-
-export const ticketTimerUpdateQuery:string = "UPDATE tickets " +
-                                        "SET timer = GREATEST(0, timer - ?) " +
-                                        "WHERE confirmed = FALSE"
-
-export const ticketTimerQuery:string = "SELECT id " +
-                                        "FROM tickets " +
-                                        "WHERE confirmed = FALSE , timer = 0"
-
-export const confirmTicketQuery:string = "UPDATE tickets " +
-                                        "SET confirmed = TRUE " +
-                                        "WHERE id = ?"

@@ -1,7 +1,7 @@
 import { QueryResult, ResultSetHeader } from "mysql2";
 import { db } from "./database-config";
 import fs from 'node:fs/promises';
-import { ShowingList, showingListQuery, MovieInfo, movieInfoQuery, ShowingInfo, showingInfoQuery, SeatingInfo, seatingQuery, TicketInfo, ticketsQuery, createTicketQuery, deleteTicketQuery, tableExistsQuery, FormattedSeating, ticketTimerUpdateQuery, ticketTimerQuery, confirmTicketQuery } from "./database-definitions";
+import { ShowingList, showingListQuery, MovieInfo, movieInfoQuery, ShowingInfo, showingInfoQuery, SeatingInfo, seatingQuery, TicketInfo, ticketsQuery, createTicketQuery, deleteTicketQuery, tableExistsQuery, FormattedSeating } from "./database-definitions";
 
 export async function getShowingList():Promise<ShowingList[]>{
     const statement = await db.execute<ShowingList[]>(showingListQuery);
@@ -38,24 +38,11 @@ export async function getTicketInfo(showingID:number):Promise<TicketInfo[] | und
 export async function createTicket(showingID:number, seatID:number):Promise<Number>{
     const newTicket = (await db.execute<ResultSetHeader>(createTicketQuery, [showingID, seatID]))[0].insertId;
 
-    if(!timerRunning){
-        timerRunning = true;
-        timer();
-        console.log("Timer started!");
-    }
-
     return newTicket;
 }
 
 export async function deleteTicket(ticketID:number):Promise<Boolean>{
     const statement = (await db.execute<ResultSetHeader>(deleteTicketQuery, [ticketID]))[0];
-
-    if(statement.affectedRows !== 0) return true;
-    else return false;
-}
-
-export async function confirmTicket(ticketID:number):Promise<Boolean>{
-    const statement = (await db.execute<ResultSetHeader>(confirmTicketQuery, [ticketID]))[0];
 
     if(statement.affectedRows !== 0) return true;
     else return false;
@@ -129,43 +116,4 @@ export function processTicketData(seatingData: SeatingInfo[], ticketData: Ticket
         }
     }
     return formattedSeats;
-}
-
-// Setting up a server side timer also, set to a time that is only possible if the user has closed the sesison
-// This will allow the server to change reserved tickets back to available without being soft locked
-let timerRunning:boolean = false;
-let timerInterval:number = 2000; // ms
-
-function delay (time: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, time));
-};
-
-//Recursive timer that runs if non-confirmed tickets exist
-async function timer(){
-    // Stop if something has stopped the timer
-    if(!timerRunning) return;
-    //Stop if tickets table doesnt exist / has been created but nothing inserted
-    if(!(await checkTableExists('tickets'))) {
-        timerRunning = false;
-        console.log("Timer Stopped!");
-        return;
-    }
-
-    await delay(timerInterval);
-
-    // Update tickets' timer in the database and stop timer if no unconfirmed exist
-    const updateStats =  (await db.execute<ResultSetHeader>(ticketTimerUpdateQuery, timerInterval / 1000))[0];
-    if(updateStats.affectedRows == 0) {
-        timerRunning = false;
-        console.log("Timer Stopped!");
-        return;
-    }
-
-    const expiredTickets = (await db.execute<TicketInfo[]>(ticketTimerQuery))[0];
-
-    await expiredTickets.forEach(async ticket => {
-        await deleteTicket(ticket.ticketID);
-    });
-
-    await timer();
 }

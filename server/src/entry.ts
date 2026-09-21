@@ -1,5 +1,5 @@
 import express from 'express';
-import { checkConnection, confirmTicket, createTicket, deleteTicket, getSeatingInfo, getShowingInfo, getShowingList, getTicketInfo, processTicketData, reloadDatabase } from './database-process';
+import { checkConnection, createTicket, deleteTicket, getSeatingInfo, getShowingInfo, getShowingList, getTicketInfo, processTicketData, reloadDatabase } from './database-process';
 
 export const api = express();
 const PORT = 5000;
@@ -48,15 +48,6 @@ api.get('/api/showings/release=:ticketID', (req, res) => {
   res.sendStatus(204);
 });
 
-//Confirm booking and end release timer
-api.get('/api/showings/confirm=:ticketID', (req, res) => {
-  const ticketID = Number(req.params.ticketID);
-
-  confirmTicket(ticketID);
-
-  res.json({ message: "Hello from the TypeScript Backend!" });
-});
-
 //Info in specific movie (Server rendered view)
 api.get('/api/movies/:movieID', async (req, res) => {
   const movieID = Number(req.params.movieID);
@@ -72,7 +63,7 @@ api.get('/api/showings/:showingID', async (req, res) => {
   res.render('showing', { showingData: showingData, seatingData: seatingData });
 });
 
-//General Movie List (Server rendered view)
+//General Showing List (Server rendered view)
 api.get('/api/showings', async (req, res) => {
   const data = await getShowingList();
 
