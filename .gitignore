@@ -25,3 +25,8 @@ dist-ssr
 
 # server credentials
 server-credentials.json
+
+# additional assignment files
+*.mp4
+*.docx
+*.pdf
