@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title><%= Error %></title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <h1>Error <%= errorCode %></h1>
+    <h2><%= errorMessage %></h2>
+</body>
+<button type="button" onclick="handleClick()">Return</button>
+</html>
+
+<script>
+
+    function handleClick(id) {
+
+        window.location.href = "/";
+    }
+
+</script>

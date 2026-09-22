@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title><%= movieData.name %></title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <h1><%= movieData.name %></h1>
+    <h2>Genre:</h2>
+    <p><%= movieData.genre %></p>
+    <h2>Director:</h2>
+    <p><%= movieData.director %></p>
+</body>
+<button type="button" onclick="handleClick()">Return</button>
+</html>
+
+<script>
+
+    const senderID = '<%= senderID %>';
+
+    function handleClick(id) {
+
+        if(senderID == 0){
+            window.location.href = "/api/showings";
+        }
+        else {
+            window.location.href = "/api/showings/" + senderID;
+        }
+    }
+
+</script>

@@ -6,7 +6,10 @@
     <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
-    <h1><%= showingData.name %> || <button type="button" onclick="handleMovieClick()">Movie Info</button></h1>
+    <h1><%= showingData.name %> || 
+        <button type="button" onclick="handleMovieClick()">Movie Info</button>
+        <button type="button" onclick="handleListClick()">Showing List</button>
+    </h1>
     <h2><%= showingData.showingDate %></h2>
 
 </body>
@@ -43,11 +46,12 @@
 <div id="timerBox" style="display: none;">
     Update Timer: <span id="timerText">10</span>
 </div>
+<h1><button type="button" onclick="handlePauseTimerClick()">Pause Timer</button></h1>
 </html>
 
 <script>
     const showingID = "<%= showingData.id %>";
-    const movieID = '<%= showingData.movie %>';
+    const movieID = '<%= showingData.movieID %>';
 
 
     const buttonList = document.querySelectorAll('.reserveButton');
@@ -67,12 +71,16 @@
     });
 
     function handleMovieClick() {
-        window.location.href = "/api/movies/" + movieID;
+        window.location.href = "/api/movies/" + movieID + "-from-" + showingID;
+    }
+
+    function handleListClick() {
+        window.location.href = "/api/showings";
     }
 
     async function handleSeatReserveClick(seatID){
 
-        const response = await fetch("/api/showings/" + showingID + "/reserve=" + seatID);
+        const response = await fetch("/api/tickets/reserve/" + seatID + "-in=" + showingID);
         const data = await response.json();
 
         sessionStorage.setItem(seatID,data.message);
@@ -83,7 +91,7 @@
     }
 
     async function handleSeatUnreserveClick(seatID){
-        await fetch('/api/showings/release=' + sessionStorage.getItem(seatID));
+        await fetch('/api/tickets/release/' + sessionStorage.getItem(seatID));
         sessionStorage.removeItem(seatID);
 
         alert("Seat Unreserved!");
@@ -93,6 +101,7 @@
 
     let timerInterval = 1000; // ms
     let timerRemaining = 10;
+    let timerRunning = true;
 
     function delay (time) {
     return new Promise((resolve) => setTimeout(resolve, time));
@@ -103,7 +112,7 @@
         
         timerBox.style.display = 'block'; 
 
-        while (true){
+        while (timerRunning){
             await delay(timerInterval);
             timerRemaining--;
             timerText.textContent = timerRemaining; 
@@ -113,6 +122,10 @@
                 return;
             }
         } 
+    }
+    
+    function handlePauseTimerClick(){
+        timerRunning = false;
     }
 
     timer();

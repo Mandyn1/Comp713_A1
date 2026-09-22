@@ -12,7 +12,7 @@ function delay (time: number): Promise<void> {
 };
 
 // Check connection to api and database then allow into main app
-fetch('/api/response')
+fetch('/api/server/response')
   .then(response => {
     if (!response.ok) throw new Error(response.statusText);
     else {

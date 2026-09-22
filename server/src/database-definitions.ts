@@ -3,7 +3,8 @@ import { RowDataPacket } from "mysql2/promise"
 export interface ShowingList extends RowDataPacket{
     id:number,
     showingDate: Date,
-    movie:string
+    movie:string,
+    movieID:number
 }
 
 export interface MovieInfo extends RowDataPacket{
@@ -15,7 +16,8 @@ export interface MovieInfo extends RowDataPacket{
 export interface ShowingInfo extends RowDataPacket{
     id:number,
     name:string,
-    showingDate:string
+    showingDate:string,
+    movieID:number
 }
 
 export interface SeatingInfo extends RowDataPacket{
@@ -36,15 +38,15 @@ export interface FormattedSeating{
     colCount:Number
 }
 
-export const showingListQuery:string = "SELECT showings.id, DATE_FORMAT(showings.showing_date, '%d/%m/%Y') as showingDate, movies.movieName as movie "+
+export const showingListQuery:string = "SELECT showings.id, DATE_FORMAT(showings.showing_date, '%d/%m/%Y') as showingDate, movies.movieName as movie, movies.id as movieID "+
                                 "from showings " +
                                 "INNER JOIN movies ON showings.movie = movies.id " +
                                 "ORDER BY showings.showing_date, movies.movieName";
 
-export const movieInfoQuery:string = "SELECT movieName, genre, director FROM movies " +
+export const movieInfoQuery:string = "SELECT movieName as name, genre, director FROM movies " +
                                 "WHERE id = ?";
 
-export const showingInfoQuery:string = "SELECT showings.id as id, movies.movieName as name, DATE_FORMAT(showings.showing_date, '%d/%m/%Y') as showingDate " + 
+export const showingInfoQuery:string = "SELECT showings.id as id, movies.movieName as name, DATE_FORMAT(showings.showing_date, '%d/%m/%Y') as showingDate, movies.id as movieID " + 
                                 "FROM showings " +
                                 "INNER JOIN movies ON showings.movie = movies.id " +
                                 "WHERE showings.id = ?";

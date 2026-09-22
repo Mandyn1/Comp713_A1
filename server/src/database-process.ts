@@ -3,51 +3,92 @@ import { db } from "./database-config";
 import fs from 'node:fs/promises';
 import { ShowingList, showingListQuery, MovieInfo, movieInfoQuery, ShowingInfo, showingInfoQuery, SeatingInfo, seatingQuery, TicketInfo, ticketsQuery, createTicketQuery, deleteTicketQuery, tableExistsQuery, FormattedSeating } from "./database-definitions";
 
-export async function getShowingList():Promise<ShowingList[]>{
-    const statement = await db.execute<ShowingList[]>(showingListQuery);
-
-    return statement[0];
+export async function getShowingList():Promise<ShowingList[]|undefined>{
+    let statement;
+    try{
+        statement = (await db.execute<ShowingList[]>(showingListQuery))[0];
+    }
+    catch(err){
+        statement = undefined;
+        console.log("getShowingList Error:\n" + err);
+    }
+    return statement;
 }
 
-export async function getMovieInfo(movieID:number):Promise<MovieInfo>{
-    const statement = await db.execute<MovieInfo[]>(movieInfoQuery, [movieID]);
-    
-    return statement[0][0];
+export async function getMovieInfo(movieID:number):Promise<MovieInfo|undefined>{
+    let statement;
+    try{
+        statement = (await db.execute<MovieInfo[]>(movieInfoQuery, [movieID]))[0][0];
+    }
+    catch(err){
+        statement = undefined;
+        console.log("getMovieInfo Error:\n" + err);
+    }
+    return statement;
 }
 
-export async function getShowingInfo(showingID:number):Promise<ShowingInfo>{
-    const statement = await db.execute<ShowingInfo[]>(showingInfoQuery, [showingID]);
-    
-    return statement[0][0];
+export async function getShowingInfo(showingID:number):Promise<ShowingInfo|undefined>{
+    let statement;
+    try{
+        statement = (await db.execute<ShowingInfo[]>(showingInfoQuery, [showingID]))[0][0];
+    }
+    catch(err){
+        statement = undefined;
+        console.log("getShowingInfo Error:\n" + err);
+    }
+    return statement;
 }
 
-export async function getSeatingInfo():Promise<SeatingInfo[]>{
-    const statement = await db.execute<SeatingInfo[]>(seatingQuery);
-
-    return statement[0];
+export async function getSeatingInfo():Promise<SeatingInfo[]|undefined>{
+    let statement;
+    try{
+        statement = (await db.execute<SeatingInfo[]>(seatingQuery))[0];
+    }
+    catch(err){
+        statement = undefined;
+        console.log("getSeatingInfo Error:\n" + err);
+    }
+    return statement;
 }
 
 export async function getTicketInfo(showingID:number):Promise<TicketInfo[] | undefined>{
-
     let statement;
-    statement = await db.execute<TicketInfo[]>(ticketsQuery, [showingID]);
-    
-    return statement[0];
+    try{
+        statement = (await db.execute<TicketInfo[]>(ticketsQuery, [showingID]))[0];
+    }
+    catch(err){
+        statement = undefined;
+        console.log("getTicketInfo Error:\n" + err);
+    }
+    return statement;
 }
 
-export async function createTicket(showingID:number, seatID:number):Promise<Number>{
-    const newTicket = (await db.execute<ResultSetHeader>(createTicketQuery, [showingID, seatID]))[0].insertId;
-
+export async function createTicket(showingID:number, seatID:number):Promise<Number|undefined>{
+    let newTicket;
+    try{
+        newTicket = (await db.execute<ResultSetHeader>(createTicketQuery, [showingID, seatID]))[0].insertId;
+    }
+    catch(err){
+        newTicket = undefined;
+        console.log("createTicket Error:\n" + err);
+    }
     return newTicket;
 }
 
-export async function deleteTicket(ticketID:number):Promise<Boolean>{
-    const statement = (await db.execute<ResultSetHeader>(deleteTicketQuery, [ticketID]))[0];
+export async function deleteTicket(ticketID:number):Promise<Boolean|undefined>{
+    let statement;
+    try{
+        statement = (await db.execute<ResultSetHeader>(deleteTicketQuery, [ticketID]))[0];
 
-    if(statement.affectedRows !== 0) {
-        return true;
+        if(statement.affectedRows !== 0) {
+            return true;
+        }
+        else return false;
     }
-    else return false;
+    catch(err){
+        statement = undefined;
+        console.log("deleteTicket Error:\n" + err);
+    }
 }
 
 export async function reloadDatabase():Promise<boolean>{
@@ -76,11 +117,18 @@ export async function checkConnection():Promise<boolean>{
     }
 }
 
-export async function checkTableExists(tableName:string):Promise<boolean>{
-    const check = (await db.execute<QueryResult>(tableExistsQuery, [tableName]))[0] as { count: number }[];
+export async function checkTableExists(tableName:string):Promise<boolean|undefined>{
+    let check;
+    try{
+        check = (await db.execute<QueryResult>(tableExistsQuery, [tableName]))[0] as { count: number }[];
 
-    if(check.length > 0 && check[0].count > 0) return true;
-    else return false;
+        if(check.length > 0 && check[0].count > 0) return true;
+        else return false;
+    }
+    catch(err){
+        console.log("getShowingList Error:\n" + err);
+        return undefined;
+    }
 }
 
 export function processTicketData(seatingData: SeatingInfo[], ticketData: TicketInfo[] | undefined):FormattedSeating{ 
@@ -118,4 +166,23 @@ export function processTicketData(seatingData: SeatingInfo[], ticketData: Ticket
         }
     }
     return formattedSeats;
+}
+
+export async function checkShowingID(showingID:number):Promise<boolean>{
+
+    try{
+        const showings = await getShowingList();
+
+        if(showings == undefined) throw new Error("getShowingList failed");
+
+        for (let i = 0; i < showings.length; i++){
+            if(showings[i].id == showingID) return true;
+        }
+
+        throw new Error("showingID not found");
+    }
+    catch(err){
+        console.log("Check Showing ID Error:\n" + err);
+        return false;
+    }
 }

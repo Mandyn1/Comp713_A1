@@ -23,7 +23,8 @@
           <td>|</td>
           <td><%= showing.movie %></td>
           <td>|</td>
-          <td><button type="button" onclick="handleClick('<%= showing.id %>')">Book</button></td>
+          <td><button type="button" onclick="handleBookClick('<%= showing.id %>')">Book</button>
+          <button type="button" onclick="handleInfoClick('<%= showing.movieID %>')">Movie Info</button></td>
         </tr>
       <% }); %>
     <% } else { %>
@@ -37,12 +38,16 @@
 </html>
 
 <script>
-  function handleClick(id) {
+  function handleBookClick(id) {
     window.location.href = "/api/showings/" + id;
   }
 
+  function handleInfoClick(id) {
+    window.location.href = "/api/movies/" + id + "-from-" + 0;
+  }
+
   function handleResetClick() {
-    fetch('/api/datareload')
+    fetch('/api/server/datareload')
     .then((response) =>{
       response.json()
       .then(data => {
