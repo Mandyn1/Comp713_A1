@@ -31,8 +31,6 @@ CREATE TABLE tickets (
     id BIGINT NOT NULL AUTO_INCREMENT,
     showing BIGINT NOT NULL,
     seat BIGINT NOT NULL,
-    confirmed BOOLEAN NOT NULL,
-    timer TINYINT,
     PRIMARY KEY (id),
     FOREIGN KEY (showing) REFERENCES showings(id),
     FOREIGN KEY (seat) REFERENCES seats(id),

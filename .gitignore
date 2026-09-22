@@ -30,3 +30,4 @@ server-credentials.json
 *.mp4
 *.docx
 *.pdf
+*.tmp
