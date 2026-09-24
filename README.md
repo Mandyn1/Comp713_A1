@@ -29,3 +29,11 @@ Program has been created function before form, resulting in a very basic viewing
 
 ### Gihub Link
 https://github.com/Mandyn1/Comp713_A1
+
+### Assignment 2 Requirements
+- Admin Pipeline (Web)
+- User Pipeline (Web)
+- User Pipeline (Android)
+- Web socket for live updates of something
+- Unit testing
+- Backend 

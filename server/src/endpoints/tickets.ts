@@ -1,5 +1,5 @@
 import express from 'express';
-import { createTicket, deleteTicket } from '../database-process';
+import { createTicket, deleteTicket } from '../services/service-tickets';
 
 const router = express.Router();
 

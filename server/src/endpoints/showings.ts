@@ -1,5 +1,8 @@
-import { getSeatingInfo, getShowingInfo, getShowingList, getTicketInfo, processTicketData } from "../database-process";
 import express from 'express';
+import { getSeatingInfo } from '../services/service-seats';
+import { getShowingList } from '../services/service-showing-list';
+import { getShowingInfo } from '../services/service-showings';
+import { processTicketData, getTicketInfo } from '../services/service-tickets';
 
 const router = express.Router();
 

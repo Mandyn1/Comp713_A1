@@ -1,5 +1,5 @@
 import express from 'express';
-import { reloadDatabase, checkConnection } from '../database-process';
+import { reloadDatabase, checkConnection } from '../services/service-database';
 
 const router = express.Router();
 

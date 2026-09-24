@@ -1,5 +1,6 @@
 import express from 'express';
-import { checkShowingID, getMovieInfo } from '../database-process';
+import { getMovieInfo } from '../services/service-movies';
+import { checkShowingID } from '../services/service-showings';
 
 const router = express.Router();
 
