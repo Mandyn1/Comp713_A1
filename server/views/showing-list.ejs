@@ -34,6 +34,20 @@
     <% } %>
   </tbody>
 </table>
+<button type="button" onclick="handleSignInClick()">Sign In</button>
+<div id="signInOverlay" style="display: none; position: fixed;">
+  <h2>Sign In</h2>
+  <form id="signInForm" action="/api/signin" method="POST">
+    <label for="username">Username:</label>
+    <input type="text" id="username" name="username" required>
+    <br>
+    <label for="password">Password:</label>
+    <input type="password" id="password" name="password" required>
+    <br>
+    <button type="button">Submit</button>
+  </form>
+  <button type="button" onclick="handleSignInClick()">Close</button>
+</div>
 <button type="button" onclick="handleResetClick()">Reset Database</button>
 </html>
 
@@ -55,5 +69,10 @@
         window.location.href = '/api/showings';
       });
     });
+  }
+
+  function handleSignInClick() {
+    if (signInOverlay.style.display == 'none') signInOverlay.style.display = 'block';
+    else signInOverlay.style.display = 'none';
   }
 </script>
