@@ -3,6 +3,7 @@ import { getSeatingInfo } from '../services/service-seats';
 import { getShowingList } from '../services/service-showing-list';
 import { getShowingInfo } from '../services/service-showings';
 import { processTicketData, getTicketInfo } from '../services/service-tickets';
+import { useAdminToken } from '../services/service-users';
 
 const router = express.Router();
 
@@ -12,6 +13,15 @@ router.get('/', async (req, res) => {
 
   if(data == undefined) res.render('error', {errorCode: 500, errorMessage:"Unable to load Showing List"});
   else await res.render('showing-list', { data: data });
+});
+
+router.get('/admin/:token', async (req, res) => {
+  const allowed = useAdminToken(String(req.params.token));
+  const data = await getShowingList();
+
+  if(allowed == false) res.redirect('/api/showings');
+  else if(data == undefined) res.render('error', {errorCode: 500, errorMessage:"Unable to load Showing List"});
+  else await res.render('admin-showing-list', { data: data });
 });
 
 //Booking page for specific showing (Server rendered view)

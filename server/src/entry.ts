@@ -14,7 +14,7 @@ api.use('/api/showings', showingsEndpoints);
 api.use('/api/tickets', ticketsEndpoints);
 api.use('/api/server', serverEndpoints);
 api.use('/api/movies', moviesEndpoints);
-api.use('/api/signin', usersEndpoints);
+api.use('/api/users', usersEndpoints);
 
 api.listen(PORT, () => {
   console.log(`[Backend] API is running on http://localhost:${PORT}`);

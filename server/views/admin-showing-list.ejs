@@ -2,9 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Showings List</title>
+    <title>Admin Showings List</title>
     <link rel="stylesheet" href="/css/style.css">
 </head>
+<h1>Admin View</h1>
 <table>
   <thead>
     <tr>
@@ -34,21 +35,7 @@
     <% } %>
   </tbody>
 </table>
-<button type="button" onclick="handleSignInClick()">Sign In</button>
-<div id="signInOverlay" style="display: none; position: fixed;">
-  <h2>Sign In</h2>
-  <form id="signInForm" action="/api/users/signin" method="POST">
-    <label for="username">Username:</label>
-    <input type="text" id="username" name="username" required>
-    <br>
-    <label for="password">Password:</label>
-    <input type="password" id="password" name="password" required>
-    <br>
-    <button type="button" onclick="handleSubmitClick()">Submit</button>
-  </form>
-  <p id="signInMessage"></p>
-  <button type="button" onclick="handleSignInClick()">Close</button>
-</div>
+<button type="button" onclick="handleSignOutClick()">Sign Out</button>
 <button type="button" onclick="handleResetClick()">Reset Database</button>
 </html>
 
@@ -72,26 +59,7 @@
     });
   }
 
-  function handleSignInClick() {
-    if (signInOverlay.style.display == 'none') signInOverlay.style.display = 'block';
-    else signInOverlay.style.display = 'none';
-  }
-
-  function handleSubmitClick() {
-    signInMessage.textContent = "Signing in...";
-
-    fetch('/api/users/signin/' + encodeURIComponent(username.value) + '-with=' + encodeURIComponent(password.value))
-    .then((response) =>{
-      return response.json()
-      .then(data => {
-        signInMessage.textContent = data.message;
-
-        if (response.ok) window.location.href = '/api/showings/admin/' + data.token;
-      });
-    })
-    .catch(error => {
-      signInMessage.textContent = "Unable to reach server";
-      console.error("Error signing in:", error);
-    });
+  function handleSignOutClick() {
+    window.location.href = "/api/showings";
   }
 </script>
