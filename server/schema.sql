@@ -1,4 +1,5 @@
 DROP TABLE IF EXISTS tickets;
+DROP TABLE IF EXISTS users;
 DROP TABLE IF EXISTS showings;
 DROP TABLE IF EXISTS seats;
 DROP TABLE IF EXISTS movies;
@@ -35,4 +36,12 @@ CREATE TABLE tickets (
     FOREIGN KEY (showing) REFERENCES showings(id),
     FOREIGN KEY (seat) REFERENCES seats(id),
     UNIQUE KEY unique_ticket (seat, showing)
+);
+
+CREATE TABLE users (
+    id BIGINT NOT NULL AUTO_INCREMENT,
+    username VARCHAR(100) NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    PRIMARY KEY (id),
+    UNIQUE KEY unique_username (username)
 );

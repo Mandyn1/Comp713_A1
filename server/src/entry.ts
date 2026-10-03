@@ -3,6 +3,7 @@ import showingsEndpoints from './endpoints/showings.js';
 import ticketsEndpoints from './endpoints/tickets.js';
 import serverEndpoints from './endpoints/server.js';
 import moviesEndpoints from './endpoints/movies.js';
+import usersEndpoints from './endpoints/users.js';
 
 export const api = express();
 const PORT = 5000;
@@ -13,6 +14,7 @@ api.use('/api/showings', showingsEndpoints);
 api.use('/api/tickets', ticketsEndpoints);
 api.use('/api/server', serverEndpoints);
 api.use('/api/movies', moviesEndpoints);
+api.use('/api/signin', usersEndpoints);
 
 api.listen(PORT, () => {
   console.log(`[Backend] API is running on http://localhost:${PORT}`);

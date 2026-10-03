@@ -44,8 +44,9 @@
     <label for="password">Password:</label>
     <input type="password" id="password" name="password" required>
     <br>
-    <button type="button">Submit</button>
+    <button type="button" onclick="handleSubmitClick()">Submit</button>
   </form>
+  <p id="signInMessage"></p>
   <button type="button" onclick="handleSignInClick()">Close</button>
 </div>
 <button type="button" onclick="handleResetClick()">Reset Database</button>
@@ -74,5 +75,20 @@
   function handleSignInClick() {
     if (signInOverlay.style.display == 'none') signInOverlay.style.display = 'block';
     else signInOverlay.style.display = 'none';
+  }
+
+  function handleSubmitClick() {
+    signInMessage.textContent = "Signing in...";
+
+    fetch('/api/signin/' + encodeURIComponent(username.value) + '-with=' + encodeURIComponent(password.value))
+    .then((response) =>{
+      return response.json().then(data => {
+        signInMessage.textContent = data.message;
+      });
+    })
+    .catch(error => {
+      signInMessage.textContent = "Unable to reach server";
+      console.error("Error signing in:", error);
+    });
   }
 </script>

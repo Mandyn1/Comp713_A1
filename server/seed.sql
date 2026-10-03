@@ -18,3 +18,7 @@ INSERT INTO showings (showing_date, movie) VALUES
 ('2026-10-21', 2),
 ('2026-10-25', 3),
 ('2026-10-26', 5);
+
+-- Username: admin, Password: admin123
+INSERT INTO users (username, password) VALUES
+('admin', '8c2e1e5b5258b0511868a6b0787d4f9b:3b0b57c1628164bd7aa14c6a5fd410dbd8230deb9f6a7ce38c56a2c14538f18c775ae7aa5c4ee34be31519c04bc78784539660c7e39fdfac76faddbf64e795da');
