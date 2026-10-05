@@ -86,7 +86,7 @@
       .then(data => {
         signInMessage.textContent = data.message;
 
-        if (response.ok) window.location.href = '/api/showings/admin/' + data.token;
+        if (response.ok) window.location.href = '/api/admin/view/' + data.token;
       });
     })
     .catch(error => {

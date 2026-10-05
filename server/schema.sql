@@ -25,7 +25,7 @@ CREATE TABLE showings (
     showing_date DATE NOT NULL,
     movie BIGINT NOT NULL,
     PRIMARY KEY (id),
-    FOREIGN KEY (movie) REFERENCES movies(id)
+    FOREIGN KEY (movie) REFERENCES movies(id) ON DELETE CASCADE
 );
 
 CREATE TABLE tickets (
@@ -33,7 +33,7 @@ CREATE TABLE tickets (
     showing BIGINT NOT NULL,
     seat BIGINT NOT NULL,
     PRIMARY KEY (id),
-    FOREIGN KEY (showing) REFERENCES showings(id),
+    FOREIGN KEY (showing) REFERENCES showings(id) ON DELETE CASCADE,
     FOREIGN KEY (seat) REFERENCES seats(id),
     UNIQUE KEY unique_ticket (seat, showing)
 );

@@ -4,9 +4,8 @@ import { UserInfo, userByUsernameQuery } from "../database-definitions";
 
 // One time tokens for the admin view, kept in memory - all to avoid just typing the url
 const adminTokens = new Map<string, number>();
-const tokenLifetime = 10000;
 
-// Any user passwords will be stored as salted hashes (hex) - basic security measure
+// Any user passwords will be stored as salted hashes (both hex) - basic security measure
 function checkPassword(password:string, stored:string):boolean{
     const [salt, hash] = stored.split(":");
     const attempt = scryptSync(password, salt, 64);
@@ -28,16 +27,19 @@ export async function checkSignIn(username:string, password:string):Promise<User
     return statement;
 }
 
-export function createAdminToken():string{
+export function createAdminToken(lifetime:number = 60 * 1000):string{
     const token = randomBytes(32).toString("hex");
-    adminTokens.set(token, Date.now() + tokenLifetime);
+    adminTokens.set(token, Date.now() + lifetime);
     return token;
 }
 
-// Token is deleted after being checked, only works once
-export function useAdminToken(token:string):boolean{
+// Token is deleted when checked so it only works once, unless keepFor gives it more time
+export function useAdminToken(token:string, keepFor:number = 0):boolean{
     const expiry = adminTokens.get(token);
-    adminTokens.delete(token);
+    const valid = expiry !== undefined && expiry > Date.now();
 
-    return expiry !== undefined && expiry > Date.now();
+    if(valid && keepFor > 0) adminTokens.set(token, Date.now() + keepFor);
+    else adminTokens.delete(token);
+
+    return valid;
 }

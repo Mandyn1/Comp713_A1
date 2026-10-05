@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="/css/style.css">
 </head>
 <h1>Admin View</h1>
+<h2>Showings</h2>
 <table>
   <thead>
     <tr>
@@ -16,37 +17,64 @@
       <th></th>
     </tr>
   </thead>
-  <tbody>
-    <% if (data && data.length > 0) { %>
-      <% data.forEach((showing, index) => { %>
-        <tr>
-          <td><%= showing.showingDate %></td>
-          <td>|</td>
-          <td><%= showing.movie %></td>
-          <td>|</td>
-          <td><button type="button" onclick="handleBookClick('<%= showing.id %>')">Book</button>
-          <button type="button" onclick="handleInfoClick('<%= showing.movieID %>')">Movie Info</button></td>
-        </tr>
-      <% }); %>
-    <% } else { %>
-      <tr>
-        <td colspan="4" style="text-align: center;">No Showings Available</td>
-      </tr>
-    <% } %>
-  </tbody>
+  <tbody id="showingsBody"></tbody>
 </table>
+<br>
 <button type="button" onclick="handleSignOutClick()">Sign Out</button>
+<button type="button" onclick="handleOverlayClick(addMovieOverlay)">Add a Movie</button>
 <button type="button" onclick="handleResetClick()">Reset Database</button>
+
+<div id="addMovieOverlay" style="display: none; position: fixed; background-color: gray;">
+  <h2>Add a Movie</h2>
+  <form id="addMovieForm">
+    <label for="movieName">Movie Name:</label>
+    <input type="text" id="movieName" name="movieName" maxlength="100" required>
+    <br>
+    <label for="movieGenre">Genre:</label>
+    <input type="text" id="movieGenre" name="movieGenre" maxlength="100" required>
+    <br>
+    <label for="movieDirector">Director:</label>
+    <input type="text" id="movieDirector" name="movieDirector" maxlength="100" required>
+    <br>
+    <button type="button" onclick="handleAddMovieSubmitClick()">Submit</button>
+  </form>
+  <p id="addMovieMessage"></p>
+  <button type="button" onclick="handleOverlayClick(addMovieOverlay)">Close</button>
+</div>
+
+<div id="showingOverlay" style="display: none; position: fixed; background-color: gray;">
+  <h2 id="showingTitle"></h2>
+  <form id="showingForm">
+    <label for="showingDate">Date:</label>
+    <input type="date" id="showingDate" name="showingDate" required>
+    <br>
+    <button type="button" onclick="handleShowingSubmitClick()">Submit</button>
+  </form>
+  <p id="showingMessage"></p>
+  <button type="button" onclick="handleOverlayClick(showingOverlay)">Close</button>
+</div>
+
+<h2>Catalogue</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Movie Name</th>
+      <th></th>
+      <th>Genre</th>
+      <th></th>
+      <th>Director</th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody id="catalogueBody"></tbody>
+</table>
 </html>
 
-<script>
-  function handleBookClick(id) {
-    window.location.href = "/api/showings/" + id;
-  }
 
-  function handleInfoClick(id) {
-    window.location.href = "/api/movies/" + id + "-from-" + 0;
-  }
+<script>
+  let showingUrl;
+  const adminHeaders = { headers: { 'Admin-Token': '<%= token %>' } };
 
   function handleResetClick() {
     fetch('/api/server/datareload')
@@ -60,6 +88,117 @@
   }
 
   function handleSignOutClick() {
-    window.location.href = "/api/showings";
+    fetch('/api/admin/signout', adminHeaders)
+    .finally(() =>{
+      window.location.href = "/api/showings";
+    });
   }
+
+  function handleOverlayClick(overlay) {
+    if (overlay.style.display == 'none') overlay.style.display = 'block';
+    else overlay.style.display = 'none';
+  }
+
+  function handleAddMovieSubmitClick() {
+    if (movieName.value.trim() == "" || movieGenre.value.trim() == "" || movieDirector.value.trim() == "") {
+      addMovieMessage.textContent = "All fields are required";
+      return;
+    }
+
+    handleRequest('/api/admin/add-movie/' + encodeURIComponent(movieName.value) + '-type=' + encodeURIComponent(movieGenre.value) + '-by=' + encodeURIComponent(movieDirector.value), addMovieMessage)
+    .then(ok => { if (ok) addMovieForm.reset(); });
+  }
+
+  // Add and edit showing share this overlay, only the title, url and date will differ
+  function handleShowingClick(title, url, date) {
+    showingTitle.textContent = title;
+    showingUrl = url;
+    showingDate.value = date;
+    showingMessage.textContent = "";
+    showingOverlay.style.display = 'block';
+  }
+
+  function handleShowingSubmitClick() {
+    if (showingDate.value == "") {
+      showingMessage.textContent = "Date is required";
+      return;
+    }
+
+    handleRequest(showingUrl + showingDate.value, showingMessage)
+    .then(ok => { if (ok) handleOverlayClick(showingOverlay); });
+  }
+
+  // Sends any admin change, shows the reply in message (or an alert if there is no message) and refreshes the tables
+  function handleRequest(url, message) {
+    if (message) message.textContent = "Sending...";
+
+    return fetch(url, adminHeaders)
+    .then((response) =>{
+      return response.json()
+      .then(data => {
+        if (message) message.textContent = data.message;
+        else if (!response.ok) alert(data.message);
+
+        if (response.ok) refreshTables();
+        return response.ok;
+      });
+    })
+    .catch(error => {
+      if (message) message.textContent = "Unable to reach server";
+      console.error("Error sending request:", error);
+      return false;
+    });
+  }
+
+  // Page cannot be reloaded (as sign in token is one use), so the tables are rebuilt from the server here
+  function refreshTables() {
+    fetch('/api/admin/lists', adminHeaders)
+    .then((response) =>{
+      response.json()
+      .then(data => {
+        if (!response.ok) return;
+
+        fillTable(showingsBody, data.showings, 'No Showings Available', showing => [
+          [showing.showingDate, '|', showing.movie, '|'],
+          [['Edit', () => handleShowingClick('Edit Showing: ' + showing.movie, '/api/admin/edit-showing/' + showing.id + '-to=', showing.showingDate.split('/').reverse().join('-'))],
+           ['Remove', () => handleRequest('/api/admin/remove-showing/' + showing.id)]]
+        ]);
+
+        fillTable(catalogueBody, data.movies, 'No Movies Available', movie => [
+          [movie.name, '|', movie.genre, '|', movie.director, '|'],
+          [['Add Showing', () => handleShowingClick('Add Showing: ' + movie.name, '/api/admin/add-showing/' + movie.id + '-on=', '')],
+           ['Delete', () => handleRequest('/api/admin/delete-movie/' + movie.id)]]
+        ]);
+      });
+    });
+  }
+
+  function fillTable(body, list, empty, makeRow) {
+    body.replaceChildren();
+
+    if (list.length == 0) {
+      const cell = body.insertRow().insertCell();
+      cell.colSpan = body.parentElement.tHead.rows[0].cells.length;
+      cell.style.textAlign = 'center';
+      cell.textContent = empty;
+    }
+
+    list.forEach(item => {
+      const row = body.insertRow();
+      const [texts, buttons] = makeRow(item);
+
+      texts.forEach(text => { row.insertCell().textContent = text; });
+
+      const cell = row.insertCell();
+      buttons.forEach(([label, handler]) => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.textContent = label;
+        button.onclick = handler;
+        cell.appendChild(button);
+      });
+    });
+  }
+
+  refreshTables();
 </script>
