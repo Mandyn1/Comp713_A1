@@ -200,5 +200,11 @@
     });
   }
 
+  // Back button can bring this page back from memory without asking the server
+  // So removing this possiblity by redirecting to the showing list page.
+  window.addEventListener('pageshow', event => {
+    if (event.persisted) window.location.href = '/api/showings';
+  });
+
   refreshTables();
 </script>
