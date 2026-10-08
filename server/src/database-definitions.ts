@@ -32,6 +32,12 @@ export interface TicketInfo extends RowDataPacket{
     seatID:number,
 }
 
+export interface UserInfo extends RowDataPacket{
+    id:number,
+    username:string,
+    password:string
+}
+
 export interface FormattedSeating{
     array:SeatingInfo[][],
     rowCount:Number,
@@ -69,3 +75,6 @@ export const tableExistsQuery:string = "SELECT COUNT(*) as count " +
                                     "FROM information_schema.tables " +
                                     "WHERE table_schema = DATABASE() " +
                                     "AND table_name = '?'"
+
+export const userByUsernameQuery:string = "SELECT id, username, password FROM users " +
+                                "WHERE username = ?";
