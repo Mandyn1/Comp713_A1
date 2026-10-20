@@ -11,7 +11,26 @@ router.get('/', async (req, res) => {
   const data = await getShowingList();
 
   if(data == undefined) res.render('error', {errorCode: 500, errorMessage:"Unable to load Showing List"});
-  else await res.render('showing-list', { data: data });
+  else{
+    await res.render('showing-list', { data: data });
+  } 
+});
+
+//showings list for mobile app to fetch all showings in json
+router.get('/list', async (req, res) => {
+  //for security using basic headers
+  if(req.headers['app-type'] !== `mobile`){
+    return res.render('error', {errorCode: 403, errorMessage:"Access Denied!"});
+  }
+
+  //get the showsing list, then check if data undefined, if not respond with json
+  const data = await getShowingList();
+
+  if(data == undefined) return res.render('error', {errorCode: 500, errorMessage:"Unable to load Showing List"});
+  else{
+    //return json response
+    res.json(data);
+  } 
 });
 
 //Booking page for specific showing (Server rendered view)
