@@ -7,7 +7,7 @@ export default function RootLayout() {
       name="index"
     />
     <Stack.Screen
-      name="bookinds"
+      name="bookings"
     />
   </Stack>
 
