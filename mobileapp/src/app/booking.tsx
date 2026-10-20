@@ -1,11 +1,7 @@
 import { Text, View, ScrollView, Pressable, Alert, StyleSheet } from "react-native";
 import { useCallback, useEffect, useState } from "react";
-import { useLocalSearchParams } from "expo-router";
-
-
-//need to move to a constraints file
-const API = "http://192.168.0.208:5000/api";
-const headers = { "app-type": "mobile" };
+import { Link, useLocalSearchParams, router } from "expo-router";
+import { API, headers } from "../constraints";
 
 interface Seat {
     id: number,
@@ -93,11 +89,21 @@ export default function Booking() {
 
   //== RETURN DISPLAY HERE ==
   return (
-    <ScrollView contentContainerStyle={{ padding: 16, gap: 8 }}>
+    //create a scroll view, contianing the booking array
+    <ScrollView contentContainerStyle={{ 
+      padding: 16, 
+      gap: 8,
+      flexGrow: 1,
+      alignItems: "center", //get in centre 1
+      justifyContent: "center" //gen in center 2
+      }}>
+      
       <Text style={{ fontSize: 24, fontWeight: "bold" }}>{booking.showingData.name}</Text>
       <Text>{booking.showingData.showingDate}</Text>
+      <Text>press a seat to reserve</Text>
 
       {booking.seatingData.array.map((row, r) => (
+        //layout the arr
         <View key={r} style={{ flexDirection: "row", gap: 6, alignItems: "center" }}>
           <Text style={{ width: 20 }}>{row[0].seatRow}</Text>
           {row.map(seat => {
@@ -119,8 +125,18 @@ export default function Booking() {
           })}
         </View>
       ))}
-      <Text>Select a seat</Text>
-      <Text>Note: make sure seat is correct, once confirmed, cannot undo</Text>
+
+      <View style={{alignItems: "center"}}>
+      <Text style={{textAlign: "center"}}>Note: make sure seat is correct, once confirmed, cannot undo booking</Text>
+      <Link href={{pathname: "/tabs"}}
+        style={{
+          backgroundColor: "white",
+          padding: 20,
+          borderRadius: 20,
+        }}>
+      <Text style={{textAlign: "center", fontSize: 17, fontWeight: "bold"}}>Confirm Booking or Exit</Text>
+      </Link>
+    </View>
     </ScrollView>
   );
 }

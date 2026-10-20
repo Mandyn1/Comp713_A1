@@ -1,6 +1,7 @@
 import { Text, View, StyleSheet, ScrollView, Image, Pressable } from "react-native";
 import {useEffect, useState} from "react";
 import { Link } from "expo-router"
+import { API, headers } from "../../constraints";
 
 //movie type
 interface Showing {
@@ -28,12 +29,7 @@ export default function Index() {
     //get showlist, perform basic header for security (minimal)
     try {
       const response = await fetch (
-        "http://192.168.0.208:5000/api/showings/list",
-        {
-          headers: {
-            "app-type": "mobile"
-          }
-        }
+        `${API}/showings/list`, {headers}
       )
       //response json
       const data = await response.json();
@@ -66,9 +62,13 @@ export default function Index() {
     <ScrollView
       contentContainerStyle={{
         gap: 16,
-        padding:16
+        padding:16,
+        flexGrow: 1,
+        alignItems: "center", //get in centre 1
+        justifyContent: "center" //gen in center 2
       }}
     >
+      <Text style={{fontSize: 28, fontWeight: "bold", textAlign: "center"}}>Current Movies</Text>
       {showings.map((showing) => (
         <Link key={showing.id}
           href={{pathname: "/booking", params: { showingID: showing.id}}}
