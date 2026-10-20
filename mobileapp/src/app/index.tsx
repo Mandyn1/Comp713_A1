@@ -63,14 +63,26 @@ export default function Index() {
   
   //== RETURN DISPLAY HERE ==
   return (
-    <ScrollView>
+    <ScrollView
+      contentContainerStyle={{
+        gap: 16,
+        padding:16
+      }}
+    >
       {showings.map((showing) => (
-        //display basic text for now
-        <View key={showing.id} style={{ alignItems: "center"}}>
-          <Text style={styles.movieName}>Movie name: {showing.movie}</Text>
+        <Link key={showing.id}
+          href={{pathname: "/booking", params: { showingID: showing.id}}}
+          style={{
+            backgroundColor: "white",
+            borderRadius: 20,
+          }}
+        >
+        <View key={showing.id} style={{ alignItems: "center", width: "100%"}}>
+          <Text style={styles.movieName}>{showing.movie}</Text>
           <Text style={styles.movieDetails}>Movie showing date: {showing.showingDate} </Text>
-          <Text style={styles.movieDetails}>Movie ID debug: {showing.movieID}</Text>
+          <Text style={styles.movieDetails}>{"\n"}Press for details & to book a seat!</Text>
         </View>
+        </Link>
       ))}
     </ScrollView>
   );

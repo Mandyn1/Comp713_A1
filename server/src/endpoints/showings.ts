@@ -26,7 +26,7 @@ router.get('/list', async (req, res) => {
   //get the showsing list, then check if data undefined, if not respond with json
   const data = await getShowingList();
 
-  if(data == undefined) return res.render('error', {errorCode: 500, errorMessage:"Unable to load Showing List"});
+  if(data == undefined) return res.statusCode = 400;
   else{
     //return json response
     res.json(data);
@@ -48,5 +48,30 @@ router.get('/:showingID', async (req, res) => {
     res.render('error', {errorCode: 500, errorMessage:"Server error"});
   }
 });
+
+//booking page for mobile app
+router.get('/booking/:showingID', async (req, res) => {
+  //header check
+  if(req.headers['app-type'] !== `mobile`){
+    return res.render('error', {errorCode: 403, errorMessage:"Access Denied!"});
+  }
+
+  //get the showing id from the parsed value, then get showing data and seating info
+  const showingID = Number(req.params.showingID);
+  const showingData = await getShowingInfo(showingID);
+  const seatingPreProcessInfo = await getSeatingInfo();
+
+  //check if showing data is correct, if not rendor error
+  if(showingData == undefined) return res.statusCode = 404;
+  else if(seatingPreProcessInfo !== undefined){
+    //get the seating data then parse into json
+    const seatingData = processTicketData(seatingPreProcessInfo, await getTicketInfo(showingID));
+    res.json({showingData: showingData, seatingData: seatingData});
+  }
+  else{
+    return res.statusCode = 500;
+  }
+
+})
 
 export default router;
