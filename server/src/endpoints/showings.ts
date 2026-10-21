@@ -26,7 +26,7 @@ router.get('/list', async (req, res) => {
   //get the showsing list, then check if data undefined, if not respond with json
   const data = await getShowingList();
 
-  if(data == undefined) return res.statusCode = 400;
+  if(data == undefined) return res.status(400).json({ error: "Client side error" })
   else{
     //return json response
     res.json(data);
@@ -62,14 +62,14 @@ router.get('/booking/:showingID', async (req, res) => {
   const seatingPreProcessInfo = await getSeatingInfo();
 
   //check if showing data is correct, if not rendor error
-  if(showingData == undefined) return res.statusCode = 404;
+  if(showingData == undefined) return res.status(404).json({ error: "Showing not found" })
   else if(seatingPreProcessInfo !== undefined){
     //get the seating data then parse into json
     const seatingData = processTicketData(seatingPreProcessInfo, await getTicketInfo(showingID));
     res.json({showingData: showingData, seatingData: seatingData});
   }
   else{
-    return res.statusCode = 500;
+    return res.status(500).json({ error: "Server Side Error" })
   }
 
 })

@@ -1,8 +1,7 @@
-
-import { useState } from "react";
+import { useState, useRef } from "react"; // CHANGED: added useRef
 import { View, Text, StyleSheet, Button } from "react-native";
 import { CameraView, useCameraPermissions } from "expo-camera";
-import { Link, router } from "expo-router";
+import { Link, router } from "expo-router"; // (Link is unused, safe to delete)
 import { API, headers } from "../../constraints";
 
 
@@ -18,6 +17,12 @@ export default function Scan() {
     //set the scanned data in the useState to store variables and other variables
     const [scannedData, setScannedData] = useState<string | null>(null);
     const [showInfo, setShowInfo] = useState<BriefShowingInfo | null>(null);
+
+    //error message to show on screen
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+    // busy flag to stop scanner constantly scanning
+    const busy = useRef(false);
 
     //check if permission, if not granted, prompt user
     if (!permission) {
@@ -38,16 +43,26 @@ export default function Scan() {
     }
 
     async function checkShowingCode(showingID: string){
+        //check scanner status
+        if (busy.current) return;
+        busy.current = true;
+
         try {
+            //first check if Qr code is number, saves having to fetch some codes
+            if (!/^\d+$/.test(showingID.trim())) {
+                setErrorMessage("Invalid Movie Code!");
+                return;
+            }
+
             //use a get req to see if the showing ID is valid
             const res = await fetch(
                 `${API}/showings/booking/${showingID}`, {headers}
             );
-            
             //if request is not valid, means invalid showingID
             if (!res.ok)  {
-                //
-                <Text>Invalid Movie Code!</Text>
+                //set error message and exit func
+                setErrorMessage("Invalid Movie Code!");
+                return;
             }
             //get the data to set the showing info
             const data = await res.json();
@@ -58,10 +73,21 @@ export default function Scan() {
 
             //now store the showing ID
             setScannedData(showingID); //this is kinda scuffed with useState but it works
+            setErrorMessage(null); //clear error messages
         } catch (e){
-            <Text>Something went wrong!</Text>
-            
+            console.log(e);
+            //also set error message to display
+            setErrorMessage("Something went wrong!");
+        } finally {
+            busy.current = false; // CHANGED: allow the next check
         }
+    }
+
+    //reset all user states, so user can scan again with new values
+    function scanAgain() {
+        setScannedData(null);
+        setShowInfo(null);
+        setErrorMessage(null);
     }
 
     async function goToBooking(showingID: string) {
@@ -88,19 +114,37 @@ export default function Scan() {
                 barcodeScannerSettings={{
                     barcodeTypes: ["qr"],
                 }}
+                //scan the data, check for error message
                 onBarcodeScanned={
-                    scannedData ? undefined : ({ data }) => {
-                        setScannedData(data); //store the data in the userState
-
+                    scannedData || errorMessage ? undefined : ({ data }) => {
+                        checkShowingCode(data); //validate the code and fetch the showing info
                     }
                 }
             />
-        {scannedData && (
-            <Button
-                title="Book the"
-                onPress={() => goToBooking(scannedData)}
-            />
-        )}
+
+            {/*show the error message to user, then give a option to scan again*/}
+            <View style={styles.result}>
+                {errorMessage && <Text>{errorMessage}</Text>}
+
+                {showInfo && (
+                    <>
+                        <Text>{showInfo.showingName}</Text>
+                        <Text>{showInfo.showingDate}</Text>
+                    </>
+                )}
+
+                {(scannedData || errorMessage) && (
+                    <Button title="Scan again" onPress={scanAgain} />
+                )}
+            </View>
+
+            {scannedData && (
+                <Button
+                    // show the booking name
+                    title={`Book ${showInfo?.showingName ?? "showing"}`}
+                    onPress={() => goToBooking(scannedData)}
+                />
+            )}
         </View>
     );
 
