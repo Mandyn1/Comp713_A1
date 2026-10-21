@@ -25,6 +25,10 @@ The Server-Cridentials file (Provided for marking)
 The project will load onto a page that checks access to the API and through that the Database. If successful, the page will wait 3 seconds then move the user to the Showings List page.  
 Outside of the starting API check page, all other pages are server rendered.  
 
+### Setup and Run the Mobile App
+- when you want to setup and run the mobile app, head over the the README inside the mobile apps folder!
+- See the [mobile app README](mobileapp/README.md) for setup and run instructions.
+
 ### Limitations
 Minimal attempts have been make to resolve any Race Conditions (Out of scope).  
 Program has been created function before form, resulting in a very basic viewing experience as a user.
