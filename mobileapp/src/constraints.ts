@@ -3,7 +3,7 @@
 //MAC: go to System Preferences, click on Network, select your network connection, IP address displayed thier 
 
 //change this value to you addres
-const address = "10.168.167.228"
+const address = "192.168.0.208"
 
 
 //DO NOT CHANGE

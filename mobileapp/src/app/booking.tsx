@@ -33,7 +33,7 @@ export default function Booking() {
         );
 
         //check servers response, if algood, set the booking from json resp
-        if (!res.ok) throw new Error('HTTP ${res.status');
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
         setBooking(await res.json());
 
     } catch (e) {
@@ -128,7 +128,7 @@ export default function Booking() {
 
       <View style={{alignItems: "center"}}>
       <Text style={{textAlign: "center"}}>Note: make sure seat is correct, once confirmed, cannot undo booking</Text>
-      <Link href={{pathname: "/tabs"}}
+      <Link href={{pathname: "/"}}
         style={{
           backgroundColor: "white",
           padding: 20,
