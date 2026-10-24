@@ -11,6 +11,12 @@ const showingClient = new (helperFunction.getProto('showing')).ShowingService(
   grpc.credentials.createInsecure()
 );
 
+//Initiate grpc client
+const ticketClient = new (helperFunction.getProto('ticket')).TicketService(
+  'localhost:' + port.ticket,
+  grpc.credentials.createInsecure()
+);
+
 //General Showing List (Server rendered view)
 router.get('/', async (req, res) => {
   showingClient.GetShowingList({}, (error:any, response:any) => {
@@ -41,25 +47,22 @@ router.get('/list', async (req, res) => {
 router.get('/:showingID', async (req, res) => {
   const showingID = Number(req.params.showingID);
 
-  showingClient.GetShowingList({showingID: showingID}, (error:any, response:any) => {
+  showingClient.GetShowingInfo({showingID: showingID}, (error:any, response:any) => {
     if(error) {
       res.render('error', {errorCode: 404, errorMessage:"No showing available with provided identifier"});
       return;
     }
-    
-  });
-  
-  //const showingData = await getShowingInfo(showingID);
-  const seatingPreProcessInfo = await getSeatingInfo();
 
-  //if(showingData == undefined) res.render('error', {errorCode: 404, errorMessage:"No showing available with provided identifier"});
-  else if(seatingPreProcessInfo !== undefined){
-    const seatingData = processTicketData(seatingPreProcessInfo, await getTicketInfo(showingID));
-    res.render('showing', { showingData: showingData, seatingData: seatingData });
-  }
-  else{
-    res.render('error', {errorCode: 500, errorMessage:"Server error"});
-  }
+    const showingData = response;
+
+    ticketClient.GetSeatingInfo({showingID: showingID}, (error:any, response:any) => {
+      if(error) {
+        res.render('error', {errorCode: 500, errorMessage:"Unable to load seating data"});
+        return;
+      }
+      res.render('showing', { showingData: showingData, seatingData: response });
+    });
+  });
 });
 
 //booking page for mobile app
@@ -69,22 +72,22 @@ router.get('/booking/:showingID', async (req, res) => {
     return res.render('error', {errorCode: 403, errorMessage:"Access Denied!"});
   }
 
-  //get the showing id from the parsed value, then get showing data and seating info
   const showingID = Number(req.params.showingID);
-  const showingData = await getShowingInfo(showingID);
-  const seatingPreProcessInfo = await getSeatingInfo();
 
-  //check if showing data is correct, if not rendor error
-  if(showingData == undefined) return res.status(404).json({ error: "Showing not found" })
-  else if(seatingPreProcessInfo !== undefined){
-    //get the seating data then parse into json
-    const seatingData = processTicketData(seatingPreProcessInfo, await getTicketInfo(showingID));
-    res.json({showingData: showingData, seatingData: seatingData});
-  }
-  else{
-    return res.status(500).json({ error: "Server Side Error" })
-  }
+  showingClient.GetShowingInfo({showingID: showingID}, (error:any, response:any) => {
+    if(error) {
+      return res.status(404).json({ error: "Showing not found" })
+    }
 
+    const showingData = response;
+
+    ticketClient.GetSeatingInfo({showingID: showingID}, (error:any, response:any) => {
+      if(error) {
+        return res.status(500).json({ error: "Server Side Error" })
+      }
+      res.json({showingData: showingData, seatingData: response});
+    });
+  });
 })
 
 export default router;

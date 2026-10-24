@@ -20,7 +20,7 @@ const startServer = () => {
   server.addService(protoPackage.ShowingService.service, {
     GetShowingList: showingHandler.getShowingList,
     GetShowingInfo: showingHandler.getShowingInfo,
-    CheckShowingID: showingHandler.checkShowingID
+    CheckShowingID: showingHandler.checkShowingID,
   });
   
   server.bindAsync(PORT, grpc.ServerCredentials.createInsecure(), (err, boundPort) => {

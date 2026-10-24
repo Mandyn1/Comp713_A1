@@ -2,7 +2,7 @@ import { ResultSetHeader } from "mysql2/promise";
 import { db } from "../database-config";
 import { createTicketQuery, deleteTicketQuery, FormattedSeating, SeatingInfo, TicketInfo, ticketsQuery } from "../database-definitions";
 
-export async function getTicketInfo(showingID:number):Promise<TicketInfo[] | undefined>{
+async function getTicketInfo(showingID:number):Promise<TicketInfo[] | undefined>{
     let statement;
     try{
         statement = (await db.execute<TicketInfo[]>(ticketsQuery, [showingID]))[0];
@@ -14,7 +14,7 @@ export async function getTicketInfo(showingID:number):Promise<TicketInfo[] | und
     return statement;
 }
 
-export async function createTicket(showingID:number, seatID:number):Promise<Number|undefined>{
+async function createTicket(showingID:number, seatID:number):Promise<Number|undefined>{
     let newTicket;
     try{
         newTicket = (await db.execute<ResultSetHeader>(createTicketQuery, [showingID, seatID]))[0].insertId;
@@ -26,7 +26,7 @@ export async function createTicket(showingID:number, seatID:number):Promise<Numb
     return newTicket;
 }
 
-export async function deleteTicket(ticketID:number):Promise<Boolean|undefined>{
+async function deleteTicket(ticketID:number):Promise<Boolean|undefined>{
     let statement;
     try{
         statement = (await db.execute<ResultSetHeader>(deleteTicketQuery, [ticketID]))[0];
@@ -42,7 +42,7 @@ export async function deleteTicket(ticketID:number):Promise<Boolean|undefined>{
     }
 }
 
-export function processTicketData(seatingData: SeatingInfo[], ticketData: TicketInfo[] | undefined):FormattedSeating{ 
+function processTicketData(seatingData: SeatingInfo[], ticketData: TicketInfo[] | undefined):FormattedSeating{ 
     // Compare seating list to ticket list and update booked
     let found:boolean;
 
@@ -78,3 +78,7 @@ export function processTicketData(seatingData: SeatingInfo[], ticketData: Ticket
     }
     return formattedSeats;
 }
+
+const ticketFunctions = { getTicketInfo, createTicket, deleteTicket, processTicketData };
+
+export default ticketFunctions;
