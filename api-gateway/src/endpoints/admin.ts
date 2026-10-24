@@ -1,6 +1,6 @@
 import express from 'express';
-import { createMovie, createShowing, deleteMovie, deleteShowing, getAdminLists, updateShowing } from '../services/service-admin';
-import { createAdminToken, useAdminToken } from '../services/service-users';
+import { createMovie, createShowing, deleteMovie, deleteShowing, getAdminLists, updateShowing } from '../../../services/user-service/src/functions/service-admin';
+import { createAdminToken, useAdminToken } from '../../../services/user-service/src/functions/user';
 
 const router = express.Router();
 const pageLifetime = 15 * 60 * 1000;

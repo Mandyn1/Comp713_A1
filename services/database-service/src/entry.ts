@@ -1,30 +1,33 @@
-import express from 'express';
-import showingsEndpoints from './endpoints/showings.js';
-import ticketsEndpoints from './endpoints/tickets.js';
-import serverEndpoints from './endpoints/server.js';
-import moviesEndpoints from './endpoints/movies.js';
-import usersEndpoints from './endpoints/users.js';
-import adminEndpoints from './endpoints/admin.js';
+import * as grpc from '@grpc/grpc-js';
+import * as protoLoader from '@grpc/proto-loader';
+import dbHandler from './handlers/database';
+import path from 'path';
 
-export const api = express();
-const PORT = 5001;
+const PORT = '0.0.0.0:50051'; 
+const protoPath = path.join(__dirname, '../../../protos/database.proto');
 
-// Middleware to handle JSON payloads
-api.use(express.json());
-api.use('/api/showings', showingsEndpoints);
-api.use('/api/tickets', ticketsEndpoints);
-api.use('/api/server', serverEndpoints);
-api.use('/api/movies', moviesEndpoints);
-api.use('/api/users', usersEndpoints);
-api.use('/api/admin', adminEndpoints);
+//Format grpc
+const packageDefinition = protoLoader.loadSync(protoPath, { keepCase: true, defaults: true });
 
-api.listen(PORT, () => {
-  console.log(`[Database-Service] API is running on http://localhost:${PORT}`);
-});
+const protoDescriptor = grpc.loadPackageDefinition(packageDefinition) as any;
+const protoPackage = protoDescriptor.database;
 
-api.set('view engine', 'ejs');
-api.use(express.static('public'));
+//Start grpc Server
+const startServer = () => {
+  const server = new grpc.Server();
 
-api.use((req, res) => {
-  res.render('error', {errorCode: 404, errorMessage:"Unable to find page"});
-});
+  server.addService(protoPackage.DatabaseService.service, {
+    DataReload: dbHandler.dataReload,
+    CheckConnection: dbHandler.checkConnection
+  });
+  
+  server.bindAsync(PORT, grpc.ServerCredentials.createInsecure(), (err, boundPort) => {
+    if (err) {
+      console.error(`Failed to start Database Service: ${err.message}`);
+      return;
+    }
+    console.log(`Database Service is listening to port ${boundPort}`);
+  });
+};
+
+startServer();

@@ -2,7 +2,7 @@ import express from 'express';
 import showingsEndpoints from './endpoints/showings.js';
 import ticketsEndpoints from './endpoints/tickets.js';
 import serverEndpoints from './endpoints/server.js';
-import moviesEndpoints from './endpoints/movies.js';
+import moviesEndpoints from '../../../api-gateway/src/endpoints/movies.js';
 import usersEndpoints from './endpoints/users.js';
 import adminEndpoints from './endpoints/admin.js';
 

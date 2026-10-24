@@ -9,8 +9,8 @@
     "dev-webapp": "concurrently \"cd webapp && npm run dev\" \"npm run dev-services\"",
     "dev-mobileapp": "concurrently \"cd mobileapp && npm run dev\" \"npm run dev-services\"", 
     "dev-services": "concurrently \"cd api-gateway && npm run dev\" \"cd services/database-service && npm run dev\" \"cd services/movie-service && npm run dev\" \"cd services/showing-service && npm run dev\" \"cd services/ticket-service && npm run dev\" \"cd services/user-service && npm run dev\"",
-    "install-all": "npm install && concurrently \"npm install-frontend\" \"npm install-services\"",
-    "install-frontend": "concurrently \"cd webapp && npm install\" \"cd mobileapp && npm install\"",
+    "install-all": "npm install && concurrently \"npm run install-frontend\" \"npm run install-services\"",
+    "install-frontend": "concurrently \"cd webapp && npm install\" \"cd mobileapp && npm install & npx expo install expo\"",
     "install-services": "concurrently \"cd api-gateway && npm install\" \"cd services/database-service && npm install\" \"cd services/movie-service && npm install\" \"cd services/showing-service && npm install\" \"cd services/ticket-service && npm install\" \"cd services/user-service && npm install\""
   },
   "keywords": [],

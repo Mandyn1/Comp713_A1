@@ -42,3 +42,6 @@ export async function checkTableExists(tableName:string):Promise<boolean|undefin
         return undefined;
     }
 }
+const dbFunctions = {reloadDatabase, checkConnection, checkTableExists};
+
+export default dbFunctions;

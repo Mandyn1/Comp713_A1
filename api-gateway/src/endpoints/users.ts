@@ -1,5 +1,5 @@
 import express from 'express';
-import { checkSignIn, createAdminToken } from '../services/service-users';
+import { checkSignIn, createAdminToken } from '../../../services/user-service/src/functions/user';
 
 const router = express.Router();
 
