@@ -1,0 +1,9 @@
+syntax = "proto3";
+package movie;
+
+service MovieService {
+  rpc GetMovieInfo (InfoRequest) returns (InfoResponse);
+}
+
+message InfoRequest { uint32 movieID = 1; }
+message InfoResponse { string name = 1; string genre = 2; string director = 3; }

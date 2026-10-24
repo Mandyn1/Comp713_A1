@@ -2,7 +2,7 @@ import { RowDataPacket } from "mysql2/promise"
 
 export interface ShowingList extends RowDataPacket{
     id:number,
-    showingDate: Date,
+    showingDate: string,
     movie:string,
     movieID:number
 }

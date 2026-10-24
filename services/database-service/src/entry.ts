@@ -2,8 +2,9 @@ import * as grpc from '@grpc/grpc-js';
 import * as protoLoader from '@grpc/proto-loader';
 import dbHandler from './handlers/database';
 import path from 'path';
+import port from '../../../port-numbers.json'
 
-const PORT = '0.0.0.0:50051'; 
+const PORT = '0.0.0.0:' + port.database; 
 const protoPath = path.join(__dirname, '../../../protos/database.proto');
 
 //Format grpc

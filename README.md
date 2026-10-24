@@ -17,10 +17,11 @@ The Server portion uses Express, Node.js, and EJS.
 The Server-Cridentials file (Provided for marking)
 
 ### Setup and Run
-1. Place 'server-credentials.json' in 'server' folder
-2. Install all dependancies using 'npm run install-all' from the main folder
-3. Run both webapp and server using 'npm run dev-all' from the main folder
-4. Copy the localhost url provided in the console, into a browser
+1. Place 'server-credentials.json' in root folder
+2. Adjust the port-numbers.json file if required
+3. Install all dependancies using 'npm run install-all' from the main folder
+4. Run both webapp and server using 'npm run dev-all' from the main folder
+5. Copy the localhost url provided in the console, into a browser
 
 The project will load onto a page that checks access to the API and through that the Database. If successful, the page will wait 3 seconds then move the user to the Showings List page.  
 Outside of the starting API check page, all other pages are server rendered.  

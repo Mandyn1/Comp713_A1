@@ -1,0 +1,14 @@
+syntax = "proto3";
+package showing;
+
+service ShowingService {
+  rpc GetShowingList (ListRequest) returns (ListResponse);
+  rpc GetShowingInfo (ShowingRequest) returns (ListItem);
+  rpc CheckShowingID (ShowingRequest) returns (CheckItem);
+}
+
+message ListRequest { }
+message ListResponse { repeated ListItem list = 1; }
+message ShowingRequest {uint32 showingID = 1;}
+message ListItem {uint32 id = 1; string showingDate = 2; string movie = 3; uint32 movieID = 4;}
+message CheckItem {bool check = 1;}

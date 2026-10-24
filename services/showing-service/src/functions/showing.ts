@@ -1,8 +1,19 @@
 import { db } from "../database-config";
-import { ShowingInfo, showingInfoQuery } from "../database-definitions";
-import { getShowingList } from "./service-showing-list";
+import { ShowingInfo, showingInfoQuery, ShowingList, showingListQuery } from "../database-definitions";
 
-export async function getShowingInfo(showingID:number):Promise<ShowingInfo|undefined>{
+async function getShowingList():Promise<ShowingList[]|undefined>{
+    let statement;
+    try{
+        statement = (await db.execute<ShowingList[]>(showingListQuery))[0];
+    }
+    catch(err){
+        statement = undefined;
+        console.log("getShowingList Error:\n" + err);
+    }
+    return statement;
+}
+
+async function getShowingInfo(showingID:number):Promise<ShowingInfo|undefined>{
     let statement;
     try{
         statement = (await db.execute<ShowingInfo[]>(showingInfoQuery, [showingID]))[0][0];
@@ -14,7 +25,7 @@ export async function getShowingInfo(showingID:number):Promise<ShowingInfo|undef
     return statement;
 }
 
-export async function checkShowingID(showingID:number):Promise<boolean>{
+async function checkShowingID(showingID:number):Promise<boolean>{
 
     try{
         const showings = await getShowingList();
@@ -32,3 +43,6 @@ export async function checkShowingID(showingID:number):Promise<boolean>{
         return false;
     }
 }
+
+const showingFunctions = {getShowingInfo, checkShowingID, getShowingList};
+export default showingFunctions;

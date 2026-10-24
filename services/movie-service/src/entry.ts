@@ -1,30 +1,33 @@
-import express from 'express';
-import showingsEndpoints from './endpoints/showings.js';
-import ticketsEndpoints from './endpoints/tickets.js';
-import serverEndpoints from './endpoints/server.js';
-import moviesEndpoints from '../../../api-gateway/src/endpoints/movies.js';
-import usersEndpoints from './endpoints/users.js';
-import adminEndpoints from './endpoints/admin.js';
+import * as grpc from '@grpc/grpc-js';
+import * as protoLoader from '@grpc/proto-loader';
+import movieHandler from './handlers/movie';
+import path from 'path';
+import port from '../../../port-numbers.json'
 
-export const api = express();
-const PORT = 5000;
+const PORT = '0.0.0.0:' + port.movie; 
+const protoPath = path.join(__dirname, '../../../protos/movie.proto');
 
-// Middleware to handle JSON payloads
-api.use(express.json());
-api.use('/api/showings', showingsEndpoints);
-api.use('/api/tickets', ticketsEndpoints);
-api.use('/api/server', serverEndpoints);
-api.use('/api/movies', moviesEndpoints);
-api.use('/api/users', usersEndpoints);
-api.use('/api/admin', adminEndpoints);
+//Format grpc
+const packageDefinition = protoLoader.loadSync(protoPath, { keepCase: true, defaults: true });
 
-api.listen(PORT, () => {
-  console.log(`[Backend] API is running on http://localhost:${PORT}`);
-});
+const protoDescriptor = grpc.loadPackageDefinition(packageDefinition) as any;
+const protoPackage = protoDescriptor.movie;
 
-api.set('view engine', 'ejs');
-api.use(express.static('public'));
+//Start grpc Server
+const startServer = () => {
+  const server = new grpc.Server();
 
-api.use((req, res) => {
-  res.render('error', {errorCode: 404, errorMessage:"Unable to find page"});
-});
+  server.addService(protoPackage.MovieService.service, {
+    GetMovieInfo: movieHandler.getMovieInfo
+  });
+  
+  server.bindAsync(PORT, grpc.ServerCredentials.createInsecure(), (err, boundPort) => {
+    if (err) {
+      console.error(`Failed to start Movie Service: ${err.message}`);
+      return;
+    }
+    console.log(`Movie Service is listening to port ${boundPort}`);
+  });
+};
+
+startServer();

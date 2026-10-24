@@ -1,19 +1,23 @@
 import express from 'express';
-import { getSeatingInfo } from '../services/service-seats';
-import { getShowingList } from '../services/service-showing-list';
-import { getShowingInfo } from '../services/service-showings';
-import { processTicketData, getTicketInfo } from '../services/service-tickets';
+import helperFunction from '../helperfunctions';
+import port from '../../../port-numbers.json'
+import * as grpc from '@grpc/grpc-js';
 
 const router = express.Router();
 
+//Initiate grpc client
+const showingClient = new (helperFunction.getProto('showing')).ShowingService(
+  'localhost:' + port.showing,
+  grpc.credentials.createInsecure()
+);
+
 //General Showing List (Server rendered view)
 router.get('/', async (req, res) => {
-  const data = await getShowingList();
+  showingClient.GetShowingList({}, (error:any, response:any) => {
 
-  if(data == undefined) res.render('error', {errorCode: 500, errorMessage:"Unable to load Showing List"});
-  else{
-    await res.render('showing-list', { data: data });
-  } 
+    if(error) res.render('error', {errorCode: 500, errorMessage:"Unable to load Showing List"});
+    else res.render('showing-list', { data: response });
+  });
 });
 
 //showings list for mobile app to fetch all showings in json
@@ -24,22 +28,31 @@ router.get('/list', async (req, res) => {
   }
 
   //get the showsing list, then check if data undefined, if not respond with json
-  const data = await getShowingList();
-
-  if(data == undefined) return res.status(400).json({ error: "Client side error" })
-  else{
-    //return json response
-    res.json(data);
-  } 
+  showingClient.GetShowingList({}, (error:any, response:any) => {
+    if(error) return res.status(400).json({ error: "Client side error" })
+    else{
+      //return json response
+      res.json(response);
+    } 
+  });
 });
 
 //Booking page for specific showing (Server rendered view)
 router.get('/:showingID', async (req, res) => {
   const showingID = Number(req.params.showingID);
-  const showingData = await getShowingInfo(showingID);
+
+  showingClient.GetShowingList({showingID: showingID}, (error:any, response:any) => {
+    if(error) {
+      res.render('error', {errorCode: 404, errorMessage:"No showing available with provided identifier"});
+      return;
+    }
+    
+  });
+  
+  //const showingData = await getShowingInfo(showingID);
   const seatingPreProcessInfo = await getSeatingInfo();
 
-  if(showingData == undefined) res.render('error', {errorCode: 404, errorMessage:"No showing available with provided identifier"});
+  //if(showingData == undefined) res.render('error', {errorCode: 404, errorMessage:"No showing available with provided identifier"});
   else if(seatingPreProcessInfo !== undefined){
     const seatingData = processTicketData(seatingPreProcessInfo, await getTicketInfo(showingID));
     res.render('showing', { showingData: showingData, seatingData: seatingData });
