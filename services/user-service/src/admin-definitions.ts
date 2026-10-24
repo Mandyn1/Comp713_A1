@@ -14,12 +14,6 @@ export const catalogueQuery:string = "SELECT movies.id, movies.movieName as name
                                 "GROUP BY movies.id, movies.movieName, movies.genre, movies.director " +
                                 "ORDER BY COUNT(showings.id) = 0, movies.movieName";
 
-export const createMovieQuery:string = "INSERT INTO movies (movieName, genre, director) " +
-                                "VALUES (?, ?, ?)";
-
-export const deleteMovieQuery:string = "DELETE FROM movies " +
-                                "WHERE id = ?";
-
 export const createShowingQuery:string = "INSERT INTO showings (movie, showing_date) " +
                                 "VALUES (?, ?)";
 

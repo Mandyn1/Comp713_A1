@@ -12,7 +12,7 @@ function checkPassword(password:string, stored:string):boolean{
     return timingSafeEqual(attempt, Buffer.from(hash, "hex"));
 }
 
-export async function checkSignIn(username:string, password:string):Promise<UserInfo|undefined>{
+async function checkSignIn(username:string, password:string):Promise<UserInfo|undefined>{
     let statement;
     try{
         const user = (await db.execute<UserInfo[]>(userByUsernameQuery, [username]))[0][0];
@@ -27,14 +27,14 @@ export async function checkSignIn(username:string, password:string):Promise<User
     return statement;
 }
 
-export function createAdminToken(lifetime:number = 60 * 1000):string{
+function createAdminToken(lifetime:number):string{
     const token = randomBytes(32).toString("hex");
     adminTokens.set(token, Date.now() + lifetime);
     return token;
 }
 
 // Token is deleted when checked so it only works once, unless keepFor gives it more time
-export function useAdminToken(token:string, keepFor:number = 0):boolean{
+function useAdminToken(token:string, keepFor:number):boolean{
     const expiry = adminTokens.get(token);
     const valid = expiry !== undefined && expiry > Date.now();
 
@@ -43,3 +43,7 @@ export function useAdminToken(token:string, keepFor:number = 0):boolean{
 
     return valid;
 }
+
+const userFunctions = { checkSignIn, createAdminToken, useAdminToken };
+
+export default userFunctions;

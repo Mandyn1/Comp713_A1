@@ -1,7 +1,6 @@
 import { ResultSetHeader } from "mysql2/promise";
 import { db } from "../database-config";
-import { CatalogueList, catalogueQuery, createMovieQuery, createShowingQuery, deleteMovieQuery, deleteShowingQuery, updateShowingQuery } from "../admin-definitions";
-import { getShowingList } from "./service-showing-list";
+import { CatalogueList, catalogueQuery, createShowingQuery, deleteShowingQuery, updateShowingQuery } from "../admin-definitions";
 
 // Runs any admin change, gives undefined if it failed or changed nothing
 async function runQuery(query:string, params:(string|number)[]):Promise<ResultSetHeader|undefined>{
@@ -34,9 +33,6 @@ export async function getAdminLists(){
     return statement;
 }
 
-// Deleting a movie or showing also removes its showings / tickets
-export const createMovie = (name:string, genre:string, director:string) => runQuery(createMovieQuery, [name, genre, director]);
-export const deleteMovie = (movieID:number) => runQuery(deleteMovieQuery, [movieID]);
 export const createShowing = (movieID:number, date:string) => runQuery(createShowingQuery, [movieID, date]);
 export const updateShowing = (showingID:number, date:string) => runQuery(updateShowingQuery, [date, showingID]);
 export const deleteShowing = (showingID:number) => runQuery(deleteShowingQuery, [showingID]);

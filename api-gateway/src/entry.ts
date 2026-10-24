@@ -3,7 +3,7 @@ import showingsEndpoints from './endpoints/showing.js';
 import ticketsEndpoints from './endpoints/tickets.js';
 import serverEndpoints from './endpoints/server.js';
 import moviesEndpoints from './endpoints/movie.js';
-import usersEndpoints from './endpoints/users.js';
+import usersEndpoints from './endpoints/user.js';
 import adminEndpoints from './endpoints/admin.js';
 import port from '../../port-numbers.json'
 

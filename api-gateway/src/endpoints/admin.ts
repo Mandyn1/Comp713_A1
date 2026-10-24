@@ -1,9 +1,16 @@
 import express from 'express';
-import { createMovie, createShowing, deleteMovie, deleteShowing, getAdminLists, updateShowing } from '../../../services/user-service/src/functions/service-admin';
-import { createAdminToken, useAdminToken } from '../../../services/user-service/src/functions/user';
+import * as grpc from '@grpc/grpc-js';
+import helperFunction from '../helperfunctions';
+import port from '../../../port-numbers.json'
 
 const router = express.Router();
 const pageLifetime = 15 * 60 * 1000;
+
+//Initiate grpc client
+const userClient = new (helperFunction.getProto('user')).UserService(
+  'localhost:' + port.user,
+  grpc.credentials.createInsecure()
+);
 
 // Formatting all dates to match yyyy-mm-dd
 router.param('date', (req, res, next, date) => {
@@ -20,23 +27,44 @@ function reply(res:express.Response, result:{ insertId:number }|undefined, done:
 // Admin View (Server rendered view, needs the one time token given at sign in)
 // The page is given its own token, which it sends with every request below
 router.get('/view/:token', async (req, res) => {
-  if(useAdminToken(String(req.params.token))) {
+
+  userClient.UseAdminToken({ token: req.params.token }, (error:any, response:any) => {
+    if(error || !response){
+      res.redirect('/api/showings');
+      return;
+    }
+
     // Stops cache collecting - stops the browser from keeping a copy that the back button could abuse
     res.set('Cache-Control', 'no-store');
-    await res.render('admin-showing-list', { token: createAdminToken(pageLifetime) });
-  }
-  else res.redirect('/api/showings');
+    userClient.CreateAdminToken({ lifetime: pageLifetime }, (error:any, response:any) => {
+      if(error){
+        console.log("Admin View Error");
+        res.redirect('/api/showings');
+        return;
+      }
+
+      res.render('admin-showing-list', { token: response });
+    });
+  });
 });
 
 router.use((req, res, next) => {
-  if(useAdminToken(String(req.get('Admin-Token')), pageLifetime)) next();
-  else res.status(401).json({ message: "Not signed in" });
+  userClient.UseAdminToken({ token: req.get('Admin-Token'), keepFor: pageLifetime }, (error:any, response:any) => {
+    if(error || !response){
+      res.status(401).json({ message: "Not signed in" });
+      return;
+    }
+
+    next();
+  });
 });
 
 // Ends the page token
 router.get('/signout', async (req, res) => {
-  useAdminToken(String(req.get('Admin-Token')));
-  res.status(200).json({ message: "Signed out!" });
+
+  userClient.UseAdminToken({ token: req.get('Admin-Token') }, (error:any, response:any) => {
+    res.status(200).json({ message: "Signed out!" });
+  });
 });
 
 router.get('/lists', async (req, res) => {
