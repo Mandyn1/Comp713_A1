@@ -13,7 +13,7 @@ function delay (time: number): Promise<void> {
 
 // Check connection to api and database then allow into main app
 fetch('/api/server/response')
-  .then(response => {
+  .then((response) => {
     if (!response.ok) throw new Error(response.statusText);
     else {
       response.json()
@@ -28,7 +28,7 @@ fetch('/api/server/response')
       })
     }
   })
-  .catch(error => {
+  .catch((error) => {
     const statusText = document.querySelector<HTMLParagraphElement>('#api-status')!;
         statusText.textContent = error;
         statusText.style.color = "red";

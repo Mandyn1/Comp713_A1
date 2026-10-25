@@ -21,13 +21,13 @@ router.get('/signin/:username-with=:password', async (req, res) => {
   userClient.CheckSignIn({username: username, password: password}, (error:any, response:any) => {
     if(error){
       console.log("Sign in failed: " + username);
-      res.status(401).json({ message: "Invalid username or password" });
+      return res.status(401).json({ message: "Invalid username or password" });
     }
 
     userClient.CreateAdminToken({}, (error:any, response:any) => {
       if(error){
-        console.log("Sign in failed: " + username);
-        res.status(409).send("Unable to create admin token");
+        console.log("Admin Token Creation Failed: " + username);
+        return res.status(409).send("Unable to create admin token");
       }
 
       console.log("Sign in successful: " + username);

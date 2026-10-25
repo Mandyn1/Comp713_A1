@@ -8,7 +8,6 @@ const getShowingList = (call: any, callback: any) => {
   .then((success) => {
 
     if(success == undefined) throw new Error("Unable to get showing list");
-    
     callback(null, {list:success});
   })
   .catch((error:any) =>{
@@ -24,7 +23,7 @@ const getShowingInfo = (call: any, callback: any) => {
   .then((success) => {
 
     if(success == undefined) throw new Error("Unable to get showing data");
-
+  
     callback(null, success);
   })
   .catch((error:any) =>{

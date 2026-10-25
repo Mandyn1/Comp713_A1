@@ -1,4 +1,4 @@
-import { QueryResult } from "mysql2";
+import { QueryResult } from "mysql2/promise";
 import { db } from "../database-config";
 import fs from 'node:fs/promises';
 import { tableExistsQuery } from "../database-definitions";
@@ -21,10 +21,12 @@ export async function reloadDatabase():Promise<boolean>{
 
 export async function checkConnection():Promise<boolean>{
     try{
-        await db.ping();
+        const connection = await db.getConnection();
+        connection.release();
         return true;
     }
     catch(err){
+        console.log(err);
         return false;
     }
 }

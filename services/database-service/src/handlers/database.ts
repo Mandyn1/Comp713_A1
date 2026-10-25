@@ -25,7 +25,7 @@ const checkConnection = (call: any, callback: any) => {
     callback(null);
   })
   .catch((error:any) =>{
-    callback({code:grpcStatus.UNAVAILABLE, details:error});
+    callback({code:grpcStatus.UNAVAILABLE, details:String(error)});
   })
 };
 

@@ -12,8 +12,7 @@ const databaseClient = new (helperFunction.getProto('database')).DatabaseService
 );
 
 //Drops database and reloads from schema.sql and seed.sql
-router.post('/datareload', async (req, res) => {
-
+router.get('/datareload', (req, res) => {
   databaseClient.DataReload({}, (error: any) => {
     if (error) return res.status(500).json({ message: "Database reload failed!" });
     return res.status(200).json({ message: "Database reloaded!" });
@@ -23,8 +22,8 @@ router.post('/datareload', async (req, res) => {
 //Checks if the database is available for interaction
 router.get('/response', async (req, res) => {
 
-  databaseClient.CheckConnection({}, (error: any) => {
-    if (error) return res.status(500).json({ messsage: "Unable to connect to Database" });
+  databaseClient.CheckConnection({}, (error: any, response:any) => {
+    if (error) return res.status(500).json({ message: error.details});
     return res.status(200).json({ message: "Connected to Database" });
   });
 });

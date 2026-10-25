@@ -20,7 +20,6 @@ const ticketClient = new (helperFunction.getProto('ticket')).TicketService(
 //General Showing List (Server rendered view)
 router.get('/', async (req, res) => {
   showingClient.GetShowingList({}, (error:any, response:any) => {
-
     if(error) res.render('error', {errorCode: 500, errorMessage:"Unable to load Showing List"});
     else res.render('showing-list', { data: response.list });
   });

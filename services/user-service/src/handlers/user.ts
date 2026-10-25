@@ -6,13 +6,13 @@ const checkSignIn = (call: any, callback: any) => {
 
   userFunctions.checkSignIn(call.request.username, call.request.password)
   .then((success) => {
-
+    console.log(success);
     if(success == undefined) throw new Error("Unable to sign in");
 
-    callback(success);
+    callback(null);
   })
-  .catch(() =>{
-    callback(grpcStatus.PERMISSION_DENIED);
+  .catch((error:any) =>{
+    callback({code:grpcStatus.PERMISSION_DENIED, details:error});
   })
 }
 
