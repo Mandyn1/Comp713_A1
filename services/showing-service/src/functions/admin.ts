@@ -1,6 +1,7 @@
-import { ResultSetHeader } from "mysql2/promise";
+import { ResultSetHeader } from "mysql2";
 import { db } from "../database-config";
-import { CatalogueList, catalogueQuery, createShowingQuery, deleteShowingQuery, updateShowingQuery } from "../admin-definitions";
+import { createShowingQuery, updateShowingQuery, deleteShowingQuery, CatalogueList, catalogueQuery } from "../database-definitions";
+import showingFunctions from "./showing";
 
 // Runs any admin change, gives undefined if it failed or changed nothing
 async function runQuery(query:string, params:(string|number)[]):Promise<ResultSetHeader|undefined>{
@@ -17,10 +18,10 @@ async function runQuery(query:string, params:(string|number)[]):Promise<ResultSe
     return statement;
 }
 
-export async function getAdminLists(){
+async function getAdminLists(){
     let statement;
     try{
-        const showings = await getShowingList();
+        const showings = await showingFunctions.getShowingList();
         const movies = (await db.execute<CatalogueList[]>(catalogueQuery))[0];
 
         if(showings == undefined) throw new Error("getShowingList failed");
@@ -33,6 +34,9 @@ export async function getAdminLists(){
     return statement;
 }
 
-export const createShowing = (movieID:number, date:string) => runQuery(createShowingQuery, [movieID, date]);
-export const updateShowing = (showingID:number, date:string) => runQuery(updateShowingQuery, [date, showingID]);
-export const deleteShowing = (showingID:number) => runQuery(deleteShowingQuery, [showingID]);
+const createShowing = (movieID:number, date:string) => runQuery(createShowingQuery, [movieID, date]);
+const updateShowing = (showingID:number, date:string) => runQuery(updateShowingQuery, [date, showingID]);
+const deleteShowing = (showingID:number) => runQuery(deleteShowingQuery, [showingID]);
+
+const adminFunctions = { getAdminLists, createShowing, updateShowing, deleteShowing };
+export default adminFunctions;

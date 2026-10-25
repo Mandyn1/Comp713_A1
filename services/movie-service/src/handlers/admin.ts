@@ -10,7 +10,7 @@ const createMovie = (call: any, callback: any) => {
 
     if(success == undefined) throw new Error("Unable to add movie");
 
-    callback(success);
+    callback();
   })
   .catch(() =>{
     callback(grpcStatus.ABORTED);
@@ -26,7 +26,7 @@ const deleteMovie = (call: any, callback: any) => {
 
     if(success == undefined) throw new Error("Unable to delete movie");
 
-    callback(success);
+    callback();
   })
   .catch(() =>{
     callback(grpcStatus.ABORTED);

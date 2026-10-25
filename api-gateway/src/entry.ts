@@ -1,7 +1,7 @@
 import express from 'express';
 import showingsEndpoints from './endpoints/showing.js';
 import ticketsEndpoints from './endpoints/tickets.js';
-import serverEndpoints from './endpoints/server.js';
+import serverEndpoints from './endpoints/database.js';
 import moviesEndpoints from './endpoints/movie.js';
 import usersEndpoints from './endpoints/user.js';
 import adminEndpoints from './endpoints/admin.js';
@@ -20,7 +20,7 @@ api.use('/api/users', usersEndpoints);
 api.use('/api/admin', adminEndpoints);
 
 api.listen(PORT, () => {
-  console.log(`[Backend] API is running on http://localhost:${PORT}`);
+  console.log(`API Gateway is running on http://localhost:${PORT}`);
 });
 
 api.set('view engine', 'ejs');

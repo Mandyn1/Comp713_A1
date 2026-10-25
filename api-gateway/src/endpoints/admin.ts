@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { response } from 'express';
 import * as grpc from '@grpc/grpc-js';
 import helperFunction from '../helperfunctions';
 import port from '../../../port-numbers.json'
@@ -9,6 +9,18 @@ const pageLifetime = 15 * 60 * 1000;
 //Initiate grpc client
 const userClient = new (helperFunction.getProto('user')).UserService(
   'localhost:' + port.user,
+  grpc.credentials.createInsecure()
+);
+
+//Initiate grpc client
+const movieClient = new (helperFunction.getProto('movie')).MovieService(
+  'localhost:' + port.movie,
+  grpc.credentials.createInsecure()
+);
+
+//Initiate grpc client
+const showingClient = new (helperFunction.getProto('showing')).ShowingService(
+  'localhost:' + port.showing,
   grpc.credentials.createInsecure()
 );
 
@@ -68,30 +80,69 @@ router.get('/signout', async (req, res) => {
 });
 
 router.get('/lists', async (req, res) => {
-  const data = await getAdminLists();
+  showingClient.GetAdminLists({ }, (error:any, response:any) => {
+    if(error) {
+      res.status(500).json({ message: "Unable to load lists" });
+      return;
+    }
 
-  if(data !== undefined) res.status(200).json(data);
-  else res.status(500).json({ message: "Unable to load lists" });
+    res.status(200).json(response);
+  });
 });
 
 router.get('/add-movie/:movieName-type=:genre-by=:director', async (req, res) => {
-  reply(res, await createMovie(String(req.params.movieName), String(req.params.genre), String(req.params.director)), "Movie added!", "Unable to add movie");
+  movieClient.CreateMovie({ name: req.params.movieName, genre: req.params.genre, director: req.params.director }, (error:any, response:any) => {
+    let data;
+
+    if(error) data = undefined;
+    else data = response;
+
+    reply(res, data, "Movie added!", "Unable to add movie");
+  });
 });
 
 router.get('/delete-movie/:movieID', async (req, res) => {
-  reply(res, await deleteMovie(Number(req.params.movieID)), "Movie deleted!", "Unable to delete movie");
+  movieClient.DeleteMovie({ movieID: Number(req.params.movieID) }, (error:any, response:any) => {
+    let data;
+
+    if(error) data = undefined;
+    else data = response;
+
+    reply(res, data, "Movie deleted!", "Unable to delete movie");
+  });
 });
 
 router.get('/add-showing/:movieID-on=:date', async (req, res) => {
-  reply(res, await createShowing(Number(req.params.movieID), String(req.params.date)), "Showing added!", "Unable to add showing");
+  showingClient.CreateShowing({ movieID: Number(req.params.movieID), date: req.params.date }, (error:any, response:any) => {
+    let data;
+
+    if(error) data = undefined;
+    else data = response;
+
+    reply(res, data, "Showing added!", "Unable to add showing");
+  });
 });
 
 router.get('/edit-showing/:showingID-to=:date', async (req, res) => {
-  reply(res, await updateShowing(Number(req.params.showingID), String(req.params.date)), "Showing updated!", "Unable to update showing");
+  showingClient.UpdateShowing({ showingID: Number(req.params.showingID), date: req.params.date }, (error:any, response:any) => {
+    let data;
+
+    if(error) data = undefined;
+    else data = response;
+
+    reply(res, data, "Showing updated!", "Unable to update showing");
+  });
 });
 
 router.get('/remove-showing/:showingID', async (req, res) => {
-  reply(res, await deleteShowing(Number(req.params.showingID)), "Showing removed!", "Unable to remove showing");
+  showingClient.UpdateShowing({ showingID: Number(req.params.showingID) }, (error:any, response:any) => {
+    let data;
+
+    if(error) data = undefined;
+    else data = response;
+
+    reply(res, data, "Showing removed!", "Unable to remove showing");
+  });
 });
 
 export default router;

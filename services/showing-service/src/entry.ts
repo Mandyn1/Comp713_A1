@@ -3,6 +3,7 @@ import * as protoLoader from '@grpc/proto-loader';
 import showingHandler from './handlers/showing';
 import path from 'path';
 import port from '../../../port-numbers.json'
+import adminHandler from './handlers/admin';
 
 const PORT = '0.0.0.0:' + port.showing;
 const protoPath = path.join(__dirname, '../../../protos/showing.proto');
@@ -21,6 +22,10 @@ const startServer = () => {
     GetShowingList: showingHandler.getShowingList,
     GetShowingInfo: showingHandler.getShowingInfo,
     CheckShowingID: showingHandler.checkShowingID,
+    CreateShowing: adminHandler.createShowing,
+    DeleteShowing: adminHandler.deleteShowing,
+    UpdateShowing: adminHandler.updateShowing,
+    GetAdminLists: adminHandler.getAdminLists
   });
   
   server.bindAsync(PORT, grpc.ServerCredentials.createInsecure(), (err, boundPort) => {
