@@ -23,7 +23,6 @@ router.get('/:movieID-from-:senderID', async (req, res) => {
   const senderID = Number(req.params.senderID);
   
   movieClient.GetMovieInfo({ movieID: movieID }, (error:any, response:any) => {
-   
     if(error) { 
       res.render('error', {errorCode: 404, errorMessage:"No movie available with provided identifier"});
       return;

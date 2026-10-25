@@ -10,10 +10,10 @@ const getMovieInfo = (call: any, callback: any) => {
 
     if(success == undefined) throw new Error("Unable to get movie data");
 
-    callback(success);
+    callback(null, success);
   })
-  .catch(() =>{
-    callback(grpcStatus.ABORTED);
+  .catch((error:any) =>{
+    callback({code:grpcStatus.ABORTED, details:error});
   })
 };
 

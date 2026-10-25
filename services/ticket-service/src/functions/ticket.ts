@@ -42,6 +42,18 @@ async function deleteTicket(ticketID:number):Promise<Boolean|undefined>{
     }
 }
 
+function flattenMatrix(matrix:any[][], rowCount:number, colCount:number){
+    let array = [];
+
+    for(let i = 0; i < rowCount; i++){
+        for(let j = 0; j < colCount; j++){
+            array.push(matrix[i][j]);
+        }
+    }
+
+    return array;
+}
+
 function processTicketData(seatingData: SeatingInfo[], ticketData: TicketInfo[] | undefined):FormattedSeating{ 
     // Compare seating list to ticket list and update booked
     let found:boolean;
@@ -76,9 +88,10 @@ function processTicketData(seatingData: SeatingInfo[], ticketData: TicketInfo[] 
             formattedSeats.array[i][j] = seatingData[i * colCount + j];
         }
     }
+
     return formattedSeats;
 }
 
-const ticketFunctions = { getTicketInfo, createTicket, deleteTicket, processTicketData };
+const ticketFunctions = { getTicketInfo, createTicket, deleteTicket, processTicketData, flattenMatrix };
 
 export default ticketFunctions;

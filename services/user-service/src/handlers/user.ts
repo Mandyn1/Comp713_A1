@@ -18,26 +18,33 @@ const checkSignIn = (call: any, callback: any) => {
 
 const createAdminToken = (call: any, callback: any) => {
     console.log(`gRPC request: Create Admin Token`);
+    try{
+      const lifetime = (call.request.lifetime !== undefined && call.request.lifetime !== null) 
+      ? call.request.lifetime 
+      : 60 * 1000;
 
-    const lifetime = (call.request.lifetime !== undefined && call.request.lifetime !== null) 
-    ? call.request.lifetime 
-    : 60 * 1000;
-
-    const token = userFunctions.createAdminToken(lifetime);
-
-    callback(token);
+      const token = userFunctions.createAdminToken(lifetime);
+      callback(null, {token:token});
+    }
+    catch(error:any){
+      callback({code:grpcStatus.ABORTED, details:error});
+    }
 }
 
 const useAdminToken = (call: any, callback: any) => {
     console.log(`gRPC request: Use Admin Token`);
+    try{
+      const keepFor = (call.request.keepFor !== undefined && call.request.keepFor !== null) 
+      ? call.request.keepFor 
+      : 0;
 
-    const keepFor = (call.request.keepFor !== undefined && call.request.keepFor !== null) 
-    ? call.request.keepFor 
-    : 0;
+      const token = userFunctions.useAdminToken(call.request.token, keepFor);
 
-    const token = userFunctions.useAdminToken(call.request.token, keepFor);
-
-    callback(token);
+      callback(null, {valid:token});
+    }
+    catch(error:any){
+      callback({code:grpcStatus.ABORTED, details:error});
+    }
 }
 
 const userHandler = { checkSignIn, createAdminToken, useAdminToken };

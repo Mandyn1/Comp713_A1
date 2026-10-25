@@ -18,7 +18,7 @@ router.get('/reserve/:seatID-in=:showingID', async (req, res) => {
 
   ticketClient.CreateTicket({showingID: showingID, seatID: seatID}, (error:any, response:any) => {
     if (error) return res.status(409).send("Unable to create ticket");
-    else return res.status(201).send({ message: response });
+    else return res.status(201).send({ message: response.ticketID });
   });
 });
 

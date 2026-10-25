@@ -4,5 +4,6 @@
     "movie": 50052,
     "showing": 50053,
     "ticket": 50054,
-    "user": 50055
+    "user": 50055,
+    "vite": 3000
 }

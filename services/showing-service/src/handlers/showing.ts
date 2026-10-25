@@ -8,11 +8,11 @@ const getShowingList = (call: any, callback: any) => {
   .then((success) => {
 
     if(success == undefined) throw new Error("Unable to get showing list");
-
-    callback(success);
+    
+    callback(null, {list:success});
   })
-  .catch(() =>{
-    callback(grpcStatus.ABORTED);
+  .catch((error:any) =>{
+    callback({code:grpcStatus.ABORTED, details:error});
   })
 }
 
@@ -25,10 +25,10 @@ const getShowingInfo = (call: any, callback: any) => {
 
     if(success == undefined) throw new Error("Unable to get showing data");
 
-    callback(success);
+    callback(null, success);
   })
-  .catch(() =>{
-    callback(grpcStatus.ABORTED);
+  .catch((error:any) =>{
+    callback({code:grpcStatus.ABORTED, details:error});
   })
 };
 
@@ -39,10 +39,10 @@ const checkShowingID = (call: any, callback: any) => {
   showingFunctions.checkShowingID(call.request.showingID)
   .then((success) => {
 
-    callback(success);
+    callback(null, {check:success});
   })
-  .catch(() =>{
-    callback(grpcStatus.ABORTED);
+  .catch((error:any) =>{
+    callback({code:grpcStatus.ABORTED, details:error});
   })
 };
 

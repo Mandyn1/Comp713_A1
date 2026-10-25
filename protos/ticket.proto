@@ -8,10 +8,10 @@ service TicketService {
 }
 
 message CreateRequest { uint32 showingID = 1; uint32 seatID = 2;}
-message CreateResponse {}
+message CreateResponse { uint32 ticketID = 1; }
 message ReleaseRequest { uint32 ticketID = 1;}
 message ReleaseResponse {}
 
-message SeatResponse { repeated SeatItem list = 1; }
+message SeatResponse { repeated SeatItem array = 1; uint32 rowCount = 2; uint32 colCount = 3; }
 message SeatRequest { uint32 showingID = 1; }
 message SeatItem {uint32 id = 1; string seatRow = 2; uint32 seatNumber = 3; bool available = 4;}

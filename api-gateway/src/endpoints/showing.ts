@@ -22,7 +22,7 @@ router.get('/', async (req, res) => {
   showingClient.GetShowingList({}, (error:any, response:any) => {
 
     if(error) res.render('error', {errorCode: 500, errorMessage:"Unable to load Showing List"});
-    else res.render('showing-list', { data: response });
+    else res.render('showing-list', { data: response.list });
   });
 });
 
@@ -60,7 +60,9 @@ router.get('/:showingID', async (req, res) => {
         res.render('error', {errorCode: 500, errorMessage:"Unable to load seating data"});
         return;
       }
-      res.render('showing', { showingData: showingData, seatingData: response });
+
+      const seatingData = helperFunction.reconstructMatrix(response.array, response.rowCount, response.colCount);
+      res.render('showing', { showingData: showingData, seatingData: {array:seatingData, rowCount:response.rowCount, colCount:response.colCount} });
     });
   });
 });

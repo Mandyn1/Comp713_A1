@@ -10,10 +10,10 @@ const createTicket = (call: any, callback: any) => {
 
     if(success == undefined) throw new Error("Unable to create ticket");
 
-    callback(success);
+    callback(null, {ticketID:success});
   })
-  .catch(() =>{
-    callback(grpcStatus.ABORTED);
+  .catch((error:any) =>{
+    callback({code:grpcStatus.ABORTED, details:error});
   })
 }
 
@@ -24,11 +24,11 @@ const releaseTicket = (call: any, callback: any) => {
   .then((success) => {
 
     if(success == undefined) throw new Error("Unable to delete ticket");
-
-    callback(success);
+    else if(!success) callback(grpcStatus.NOT_FOUND);
+    else callback(null);
   })
-  .catch(() =>{
-    callback(grpcStatus.ABORTED);
+  .catch((error:any) =>{
+    callback({code:grpcStatus.ABORTED, details:error});
   })
 }
 
@@ -38,20 +38,19 @@ const processTicketData = (call: any, callback: any) => {
   seatFunctions.getSeatingInfo()
   .then((seatData) => {
     if(seatData == undefined) throw new Error("Unable to get seating data");
-
+    
     ticketFunctions.getTicketInfo(call.request.showingID)
     .then((ticketData) => {
-
+        
         const formattedSeating = ticketFunctions.processTicketData(seatData, ticketData);
-
-        callback(formattedSeating);
-    })
-
-    throw new Error("Error sending seating data");
+        const returnData = {array:ticketFunctions.flattenMatrix(formattedSeating.array, formattedSeating.rowCount, formattedSeating.colCount), rowCount:formattedSeating.rowCount, colCount:formattedSeating.colCount};
+        callback(null, returnData);
+        return;
+    });
   })
-  .catch(() =>{
-    callback(grpcStatus.ABORTED);
-  })
+  .catch((error:any) =>{
+    callback({code:grpcStatus.ABORTED, details:error});
+  });
 }
 
 const ticketHandler = {createTicket, releaseTicket, processTicketData};

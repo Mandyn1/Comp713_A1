@@ -31,7 +31,7 @@ router.get('/signin/:username-with=:password', async (req, res) => {
       }
 
       console.log("Sign in successful: " + username);
-      res.status(200).json({ message: "Signed in!", token: response });
+      res.status(200).json({ message: "Signed in!", token: response.token });
     });
   });
 });

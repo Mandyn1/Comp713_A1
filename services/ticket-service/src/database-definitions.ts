@@ -14,8 +14,8 @@ export interface TicketInfo extends RowDataPacket{
 
 export interface FormattedSeating{
     array:SeatingInfo[][],
-    rowCount:Number,
-    colCount:Number
+    rowCount:number,
+    colCount:number
 }
 
 export const seatingQuery:string = "SELECT seats.id as id, seats.seatRow as seatRow, seats.seatNumber as seatNumber " + 

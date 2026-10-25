@@ -41,7 +41,7 @@ function reply(res:express.Response, result:{ insertId:number }|undefined, done:
 router.get('/view/:token', async (req, res) => {
 
   userClient.UseAdminToken({ token: req.params.token }, (error:any, response:any) => {
-    if(error || !response){
+    if(error || !response.valid){
       res.redirect('/api/showings');
       return;
     }
@@ -55,14 +55,14 @@ router.get('/view/:token', async (req, res) => {
         return;
       }
 
-      res.render('admin-showing-list', { token: response });
+      res.render('admin-showing-list', { token: response.token });
     });
   });
 });
 
 router.use((req, res, next) => {
   userClient.UseAdminToken({ token: req.get('Admin-Token'), keepFor: pageLifetime }, (error:any, response:any) => {
-    if(error || !response){
+    if(error || !response.valid){
       res.status(401).json({ message: "Not signed in" });
       return;
     }
