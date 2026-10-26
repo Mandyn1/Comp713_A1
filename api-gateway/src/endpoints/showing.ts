@@ -17,38 +17,31 @@ const ticketClient = new (helperFunction.getProto('ticket')).TicketService(
   grpc.credentials.createInsecure()
 );
 
-//General Showing List (Server rendered view)
+//General Showing List (Server rendered view or Json payload if mobile)
 router.get('/', async (req, res) => {
+  const notMobile = req.headers['app-type'] !== `mobile`;
+
   showingClient.GetShowingList({}, (error:any, response:any) => {
-    if(error) res.render('error', {errorCode: 500, errorMessage:"Unable to load Showing List"});
-    else res.render('showing-list', { data: response.list });
+    if(error) {
+      if(notMobile) res.render('error', {errorCode: 500, errorMessage:"Unable to load Showing List"});
+      else res.status(500).json({ error: "Unable to load Showing List" });
+    }
+    else {
+      if (notMobile) res.render('showing-list', { data: response.list });
+      else res.status(200).json(response.list);
+    }
   });
 });
 
-//showings list for mobile app to fetch all showings in json
-router.get('/list', async (req, res) => {
-  //for security using basic headers
-  if(req.headers['app-type'] !== `mobile`){
-    return res.render('error', {errorCode: 403, errorMessage:"Access Denied!"});
-  }
-
-  //get the showsing list, then check if data undefined, if not respond with json
-  showingClient.GetShowingList({}, (error:any, response:any) => {
-    if(error) return res.status(400).json({ error: "Client side error" })
-    else{
-      //return json response
-      res.json(response);
-    } 
-  });
-});
-
-//Booking page for specific showing (Server rendered view)
+//Booking page for specific showing (Server rendered view or Json payload if mobile)
 router.get('/:showingID', async (req, res) => {
   const showingID = Number(req.params.showingID);
+  const notMobile = req.headers['app-type'] !== `mobile`;
 
   showingClient.GetShowingInfo({showingID: showingID}, (error:any, response:any) => {
     if(error) {
-      res.render('error', {errorCode: 404, errorMessage:"No showing available with provided identifier"});
+      if(notMobile) res.render('error', {errorCode: 404, errorMessage:"No showing available with provided identifier"});
+      else res.status(404).json({ error: "No showing available with provided identifier" });
       return;
     }
 
@@ -56,38 +49,15 @@ router.get('/:showingID', async (req, res) => {
 
     ticketClient.GetSeatingInfo({showingID: showingID}, (error:any, response:any) => {
       if(error) {
-        res.render('error', {errorCode: 500, errorMessage:"Unable to load seating data"});
+        if(notMobile) res.render('error', {errorCode: 500, errorMessage:"Unable to load seating data"});
+        else res.status(500).json({ error: "Unable to load seating data" });
         return;
       }
 
-      res.render('showing', { showingData: showingData, seatingData: {array:response.array, rowCount:response.rowCount, colCount:response.colCount} });
+      if(notMobile) res.render('showing', { showingData: showingData, seatingData: {array:response.array, rowCount:response.rowCount, colCount:response.colCount} });
+      else res.status(200).json({showingData: showingData, seatingData: response});
     });
   });
 });
-
-//booking page for mobile app
-router.get('/booking/:showingID', async (req, res) => {
-  //header check
-  if(req.headers['app-type'] !== `mobile`){
-    return res.render('error', {errorCode: 403, errorMessage:"Access Denied!"});
-  }
-
-  const showingID = Number(req.params.showingID);
-
-  showingClient.GetShowingInfo({showingID: showingID}, (error:any, response:any) => {
-    if(error) {
-      return res.status(404).json({ error: "Showing not found" })
-    }
-
-    const showingData = response;
-
-    ticketClient.GetSeatingInfo({showingID: showingID}, (error:any, response:any) => {
-      if(error) {
-        return res.status(500).json({ error: "Server Side Error" })
-      }
-      res.json({showingData: showingData, seatingData: response});
-    });
-  });
-})
 
 export default router;

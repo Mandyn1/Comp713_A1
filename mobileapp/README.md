@@ -8,23 +8,21 @@
 2. once compatable expo version is installed, head to next step 
 
 ## Step 2: Install package dependencies
-1. make sure you are in the root of the mobileapp folder `COM713-A1/mobileapp` and the run the following commands to install required packages
-   - `npm install`
-   - `npx expo install expo`
+1. Use install instructions from the root README
 
 ## Step 3: Setup correct constraints
-1. locate the `constraints.ts` file under `/src/constraints.ts`
-2. open file, and edit the `const address` to your address and nothing more
+1. locate the `port-numbers.json` file in the global root folder
+2. open file, and edit the `hostAddress` to your IP address
+- Windows: use command ipconfig /all to view host IP
+- MAC: go to System Preferences, click on Network, select your network connection, IP address displayed there  
 
 ## Step 4: start the services
-1. make sure you have the server credentials JSON file as previously described in root readme
-2. start server using methods in root readme
-3. start mobile app using command:
-   - `npx expo start`
+1. Use start instructions from root README
 
 ## Step 5: Run the app!
 1. go on your phone and open expo go
 2. press scan QR
 3. scan the QR code that was generated in the terminal when using command `npx expo start`
 4. Use the app!
-
+  
+Note: if the QR code doesn't appear, the development server may appear within Expo Go anyway if on the same internet.

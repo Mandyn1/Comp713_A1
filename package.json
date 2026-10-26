@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev-all": "concurrently \"npm run dev-webapp\" \"npm run dev-mobileapp\" \"npm run dev-services\"",
     "dev-webapp": "concurrently \"cd webapp && npm run dev\" \"npm run dev-services\"",
-    "dev-mobileapp": "concurrently \"cd mobileapp && npm run dev\" \"npm run dev-services\"", 
+    "dev-mobileapp": "concurrently \"cd mobileapp && npm run start\" \"npm run dev-services\"", 
     "dev-services": "concurrently \"cd api-gateway && npm run dev\" \"cd services/database-service && npm run dev\" \"cd services/movie-service && npm run dev\" \"cd services/showing-service && npm run dev\" \"cd services/ticket-service && npm run dev\" \"cd services/user-service && npm run dev\"",
     "install-all": "npm install && concurrently \"npm run install-frontend\" \"npm run install-services\"",
     "install-frontend": "concurrently \"cd webapp && npm install\" \"cd mobileapp && npm install & npx expo install expo\"",

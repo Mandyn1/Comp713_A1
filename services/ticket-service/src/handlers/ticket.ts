@@ -43,7 +43,13 @@ const processTicketData = (call: any, callback: any) => {
     .then((ticketData) => {
         
         const formattedSeating = ticketFunctions.processTicketData(seatData, ticketData);
-        const returnData = {array:ticketFunctions.flattenMatrix(formattedSeating.array, formattedSeating.rowCount, formattedSeating.colCount), rowCount:formattedSeating.rowCount, colCount:formattedSeating.colCount};
+        
+        const returnData = {
+          array:ticketFunctions.flattenMatrix(formattedSeating.array, formattedSeating.rowCount, formattedSeating.colCount),
+          rowCount:formattedSeating.rowCount,
+          colCount:formattedSeating.colCount
+        };
+
         callback(null, returnData);
         return;
     });

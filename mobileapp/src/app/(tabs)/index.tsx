@@ -29,7 +29,7 @@ export default function Index() {
     //get showlist, perform basic header for security (minimal)
     try {
       const response = await fetch (
-        `${API}/showings/list`, {headers}
+        `${API}/showings`, {headers}
       )
       //response json
       const data = await response.json();
@@ -49,7 +49,7 @@ export default function Index() {
 
       //now set the state variable
       setShowings(allMovies);
-      console.log(data);
+      //console.log(data);
     } catch(error){
       console.log("Error fetching showings", error);
     }
