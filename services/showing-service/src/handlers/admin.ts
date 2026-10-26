@@ -58,7 +58,7 @@ const getAdminLists = (call: any, callback: any) => {
 
     if(success == undefined) throw new Error("Unable to get admin list");
 
-    callback(success);
+    callback(null, success);
   })
   .catch((error:any) =>{
     callback({code:grpcStatus.ABORTED, details:error});

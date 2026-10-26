@@ -95,7 +95,7 @@ router.get('/add-movie/:movieName-type=:genre-by=:director', async (req, res) =>
     let data;
 
     if(error) data = undefined;
-    else data = response;
+    else data = response.rowID;
 
     reply(res, data, "Movie added!", "Unable to add movie");
   });
@@ -106,7 +106,7 @@ router.get('/delete-movie/:movieID', async (req, res) => {
     let data;
 
     if(error) data = undefined;
-    else data = response;
+    else data = response.rowID;
 
     reply(res, data, "Movie deleted!", "Unable to delete movie");
   });
@@ -135,7 +135,7 @@ router.get('/edit-showing/:showingID-to=:date', async (req, res) => {
 });
 
 router.get('/remove-showing/:showingID', async (req, res) => {
-  showingClient.UpdateShowing({ showingID: Number(req.params.showingID) }, (error:any, response:any) => {
+  showingClient.DeleteShowing({ showingID: Number(req.params.showingID) }, (error:any, response:any) => {
     let data;
 
     if(error) data = undefined;

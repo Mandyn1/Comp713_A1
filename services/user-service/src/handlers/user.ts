@@ -6,7 +6,6 @@ const checkSignIn = (call: any, callback: any) => {
 
   userFunctions.checkSignIn(call.request.username, call.request.password)
   .then((success) => {
-    console.log(success);
     if(success == undefined) throw new Error("Unable to sign in");
 
     callback(null);

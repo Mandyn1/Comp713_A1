@@ -13,19 +13,6 @@ function getProto(protoName:string){
     return protoPackage;
 }
 
-function reconstructMatrix(array:any[], rowCount:number, colCount:number){
-    let matrix: any[][] = Array.from({ length: rowCount }, () => 
-        Array(colCount).fill(0)
-    );
-    for(let i = 0; i < rowCount; i++){
-        for(let j = 0; j < colCount; j++){
-            matrix[i][j] = array[i * j + j];
-        }
-    }
-
-    return matrix;
-}
-
-const helperFunction = {getProto, reconstructMatrix};
+const helperFunction = {getProto};
 
 export default helperFunction;

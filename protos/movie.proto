@@ -10,6 +10,6 @@ service MovieService {
 message InfoRequest { uint32 movieID = 1; }
 message InfoResponse { string name = 1; string genre = 2; string director = 3; }
 message CreateMovieRequest { string name = 1; string genre = 2; string director = 3; }
-message CreateMovieResponse {}
+message CreateMovieResponse { uint32 rowID = 1; }
 message DeleteMovieRequest { uint32 movieID = 1; }
-message DeleteMovieResponse {}
+message DeleteMovieResponse { uint32 rowID = 1; }

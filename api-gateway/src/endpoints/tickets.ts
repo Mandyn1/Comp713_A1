@@ -26,7 +26,7 @@ router.get('/reserve/:seatID-in=:showingID', async (req, res) => {
 router.get('/release/:ticketID', async (req, res) => {
   const ticketID = Number(req.params.ticketID);
 
-  ticketClient.DeleteTicket({ticketID: ticketID}, (error:any, response:any) => {
+  ticketClient.ReleaseTicket({ticketID: ticketID}, (error:any, response:any) => {
     if (error) return res.status(409).send("Unable to delete ticket");
     else return res.sendStatus(204);
   });

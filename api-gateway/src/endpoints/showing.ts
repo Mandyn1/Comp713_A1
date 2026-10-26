@@ -60,8 +60,7 @@ router.get('/:showingID', async (req, res) => {
         return;
       }
 
-      const seatingData = helperFunction.reconstructMatrix(response.array, response.rowCount, response.colCount);
-      res.render('showing', { showingData: showingData, seatingData: {array:seatingData, rowCount:response.rowCount, colCount:response.colCount} });
+      res.render('showing', { showingData: showingData, seatingData: {array:response.array, rowCount:response.rowCount, colCount:response.colCount} });
     });
   });
 });

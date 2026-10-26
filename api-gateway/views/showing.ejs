@@ -27,11 +27,11 @@
         <tbody>
             <% for(let i = 0; i < seatingData.rowCount; i++) { %>
                 <tr>
-                    <th><%= seatingData.array[i][0].seatRow %></th>
+                    <th><%= seatingData.array[i*seatingData.colCount].seatRow %></th>
                     <% for(let j = 0; j < seatingData.colCount; j++) { %>
                         <td><button class="reserveButton" 
-                            seatID="<%= seatingData.array[i][j].id %>"
-                            available="<%= seatingData.array[i][j].available %>"
+                            seatID="<%= seatingData.array[i*j + j].id %>"
+                            available="<%= seatingData.array[i*j + j].available %>"
                             >Taken</button></td>
                     <% }; %>
                 </tr>

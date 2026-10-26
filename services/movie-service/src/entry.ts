@@ -3,6 +3,7 @@ import * as protoLoader from '@grpc/proto-loader';
 import movieHandler from './handlers/movie';
 import path from 'path';
 import port from '../../../port-numbers.json'
+import adminHandler from './handlers/admin';
 
 const PORT = '0.0.0.0:' + port.movie; 
 const protoPath = path.join(__dirname, '../../../protos/movie.proto');
@@ -18,7 +19,9 @@ const startServer = () => {
   const server = new grpc.Server();
 
   server.addService(protoPackage.MovieService.service, {
-    GetMovieInfo: movieHandler.getMovieInfo
+    GetMovieInfo: movieHandler.getMovieInfo,
+    CreateMovie: adminHandler.createMovie,
+    DeleteMovie: adminHandler.deleteMovie
   });
   
   server.bindAsync(PORT, grpc.ServerCredentials.createInsecure(), (err, boundPort) => {
