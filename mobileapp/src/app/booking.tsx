@@ -29,12 +29,15 @@ export default function Booking() {
     try {
         //get the response and check if it returns, then set the booking info
         const res = await fetch(
-            `${API}/showings/booking/${showingID}`, {headers}
+            `${API}/showings/${showingID}`, {headers}
         );
 
         //check servers response, if algood, set the booking from json resp
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        setBooking(await res.json());
+        let data = await res.json();
+        let temp = formatSeatArray(data.seatingData.array, data.seatingData.rowCount, data.seatingData.colCount);
+        data.seatingData.array = temp;
+        setBooking(data);
 
     } catch (e) {
         console.log("load failed", e);
@@ -82,6 +85,23 @@ export default function Booking() {
     );
     setMyTickets(prev => { const { [seatID]: _, ...rest } = prev; return rest; });
     load();
+  }
+
+  // Function for converting seat array from 1D to 2D
+  function formatSeatArray(array:Seat[], rowCount:number, colCount:number):Seat[][]{
+    let newArray:Seat[][] = [];
+    let tempArray:Seat[];
+    let index = 0;
+
+    for(let i = 0; i < rowCount; i++){
+      tempArray = [];
+      for(let j = 0; j < colCount; j++){
+        index = i*colCount + j;
+        tempArray.push(array[index]);
+      }
+      newArray.push(tempArray);
+    }
+    return newArray;
   }
 
   //display a small text noting of loading (from API call)

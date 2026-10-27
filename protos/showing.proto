@@ -1,0 +1,28 @@
+syntax = "proto3";
+package showing;
+
+service ShowingService {
+  rpc GetShowingList (ListRequest) returns (ListResponse);
+  rpc GetShowingInfo (ShowingRequest) returns (ShowingInfoResponse);
+  rpc CheckShowingID (ShowingRequest) returns (CheckItem);
+  rpc CreateShowing (CreateShowingRequest) returns (CreateShowingResponse);
+  rpc DeleteShowing (DeleteShowingRequest) returns (DeleteShowingResponse);
+  rpc UpdateShowing (UpdateShowingRequest) returns (UpdateShowingResponse);
+  rpc GetAdminLists (AdminListRequest) returns (AdminListResponse);
+}
+
+message ListRequest { }
+message ListResponse { repeated ShowingListItem list = 1; }
+message ShowingRequest {uint32 showingID = 1;}
+message ShowingListItem {uint32 id = 1; string movie = 2; string showingDate = 3; uint32 movieID = 4;}
+message ShowingInfoResponse {uint32 id = 1; string name = 2; string showingDate = 3; uint32 movieID = 4;}
+message CheckItem {bool check = 1;}
+message CreateShowingRequest { uint32 movieID = 1; string date = 2; }
+message CreateShowingResponse {}
+message DeleteShowingRequest { uint32 showingID = 1; }
+message DeleteShowingResponse {}
+message UpdateShowingRequest { uint32 showingID = 1; string date = 2; }
+message UpdateShowingResponse {}
+message MovieListItem { uint32 id = 1; string name = 2; string genre = 3; string director = 4; }
+message AdminListRequest {}
+message AdminListResponse { repeated ShowingListItem showings = 1; repeated MovieListItem movies = 2;}

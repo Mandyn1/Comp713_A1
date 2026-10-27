@@ -1,0 +1,15 @@
+syntax = "proto3";
+package movie;
+
+service MovieService {
+  rpc GetMovieInfo (InfoRequest) returns (InfoResponse);
+  rpc CreateMovie (CreateMovieRequest) returns (CreateMovieResponse);
+  rpc DeleteMovie (DeleteMovieRequest) returns (DeleteMovieResponse);
+}
+
+message InfoRequest { uint32 movieID = 1; }
+message InfoResponse { string name = 1; string genre = 2; string director = 3; }
+message CreateMovieRequest { string name = 1; string genre = 2; string director = 3; }
+message CreateMovieResponse { uint32 rowID = 1; }
+message DeleteMovieRequest { uint32 movieID = 1; }
+message DeleteMovieResponse { uint32 rowID = 1; }

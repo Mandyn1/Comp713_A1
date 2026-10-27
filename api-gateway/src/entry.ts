@@ -1,0 +1,31 @@
+import express from 'express';
+import showingsEndpoints from './endpoints/showing.js';
+import ticketsEndpoints from './endpoints/tickets.js';
+import serverEndpoints from './endpoints/database.js';
+import moviesEndpoints from './endpoints/movie.js';
+import usersEndpoints from './endpoints/user.js';
+import adminEndpoints from './endpoints/admin.js';
+import port from '../../port-numbers.json'
+
+export const api = express();
+const PORT = port.gateway;
+
+// Middleware to handle JSON payloads
+api.use(express.json());
+api.use('/api/showings', showingsEndpoints);
+api.use('/api/tickets', ticketsEndpoints);
+api.use('/api/server', serverEndpoints);
+api.use('/api/movies', moviesEndpoints);
+api.use('/api/users', usersEndpoints);
+api.use('/api/admin', adminEndpoints);
+
+api.listen(PORT, () => {
+  console.log(`API Gateway is running on http://localhost:${PORT}`);
+});
+
+api.set('view engine', 'ejs');
+api.use(express.static('public'));
+
+api.use((req, res) => {
+  res.render('error', {errorCode: 404, errorMessage:"Unable to find page"});
+});

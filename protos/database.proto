@@ -1,0 +1,13 @@
+syntax = "proto3";
+package database;
+
+service DatabaseService {
+  rpc DataReload (ReloadRequest) returns (ReloadResponse);
+  rpc CheckConnection (CheckRequest) returns (CheckResponse);
+}
+
+message ReloadRequest { }
+message ReloadResponse { }
+
+message CheckRequest {}
+message CheckResponse { }

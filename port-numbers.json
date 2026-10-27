@@ -1,0 +1,10 @@
+{
+    "gateway": 5000,
+    "database": 50051,
+    "movie": 50052,
+    "showing": 50053,
+    "ticket": 50054,
+    "user": 50055,
+    "vite": 3000,
+    "hostAddress":"192.168.20.11"
+}

@@ -56,7 +56,7 @@ export default function Scan() {
 
             //use a get req to see if the showing ID is valid
             const res = await fetch(
-                `${API}/showings/booking/${showingID}`, {headers}
+                `${API}/showings/${showingID}`, {headers}
             );
             //if request is not valid, means invalid showingID
             if (!res.ok)  {
