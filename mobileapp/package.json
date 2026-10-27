@@ -36,7 +36,7 @@
     "typescript": "~6.0.3"
   },
   "scripts": {
-    "start":"npm run prestart && expo start",
+    "start": "npm run prestart && expo start",
     "android": "npm run prestart && expo start --android",
     "ios": "npm run prestart && expo start --ios",
     "web": "npm run prestart && expo start --web",

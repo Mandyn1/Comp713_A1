@@ -77,7 +77,7 @@
   const adminHeaders = { headers: { 'Admin-Token': '<%= token %>' } };
 
   function handleResetClick() {
-    fetch('/api/server/datareload')
+    fetch('/api/admin/datareload', adminHeaders)
     .then((response) =>{
       response.json()
       .then(data => {
