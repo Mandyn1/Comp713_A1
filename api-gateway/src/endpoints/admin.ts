@@ -19,6 +19,12 @@ const movieClient = new (helperFunction.getProto('movie')).MovieService(
 );
 
 //Initiate grpc client
+const databaseClient = new (helperFunction.getProto('database')).DatabaseService(
+  'localhost:' + port.database,
+  grpc.credentials.createInsecure()
+);
+
+//Initiate grpc client
 const showingClient = new (helperFunction.getProto('showing')).ShowingService(
   'localhost:' + port.showing,
   grpc.credentials.createInsecure()
@@ -76,6 +82,14 @@ router.get('/signout', async (req, res) => {
 
   userClient.UseAdminToken({ token: req.get('Admin-Token') }, (error:any, response:any) => {
     res.status(200).json({ message: "Signed out!" });
+  });
+});
+
+//Drops database and reloads from schema.sql and seed.sql (admin only, as it is below the token check)
+router.get('/datareload', (req, res) => {
+  databaseClient.DataReload({}, (error: any) => {
+    if (error) return res.status(500).json({ message: "Database reload failed!" });
+    return res.status(200).json({ message: "Database reloaded!" });
   });
 });
 
