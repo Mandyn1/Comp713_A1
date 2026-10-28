@@ -38,6 +38,7 @@ The project will load onto a page that checks access to the API and through that
 Outside of the starting API check page, all other pages are server rendered.  
 
 ## Setup and Run the Mobile App
+Please note that due to restrictions within the AUT internet, a hotspot from a third device on mobile data is required to test this feature. Both the testing device and the host computer must be on this hotspot.
 ### Step 1: Install expo go
 1. on your device, head to the respective app store and install the latest version of expo go
    - NOTE: this uses the SDK58 you NEED the latest version of expo go (version compatable with SDK58), if the latest store version does not work use the following link:
